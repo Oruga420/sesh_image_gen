@@ -213,17 +213,17 @@ export default function ImageGenPage() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Image Generation</h1>
-          <p className="text-gray-600 dark:text-gray-300">Create stunning images with AI</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Image Generation</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Create stunning images with AI</p>
         </div>
         
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Controls Panel */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Generation Settings</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 dark:border-gray-700 order-2 lg:order-1">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">Generation Settings</h2>
             
             <ModelSelect />
             <PromptBox />
@@ -248,7 +248,7 @@ export default function ImageGenPage() {
           </div>
           
           {/* Output Panel */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 dark:border-gray-700 order-1 lg:order-2">
             <OutputGrid />
           </div>
         </div>

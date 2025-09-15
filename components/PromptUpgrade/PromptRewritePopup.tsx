@@ -103,12 +103,12 @@ export default function PromptRewritePopup() {
     <Dialog 
       open={isUpgradeOpen} 
       onOpenChange={setIsUpgradeOpen}
-      className="max-w-2xl"
+      className="max-w-2xl sm:max-w-3xl w-full"
     >
-      <div className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg">
+      <div className="space-y-4 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Upgrade Your Prompt</h2>
-          <Button variant="ghost" size="sm" onClick={handleClose} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Upgrade Your Prompt</h2>
+          <Button variant="ghost" size="sm" onClick={handleClose} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 shrink-0">
             ✕
           </Button>
         </div>
@@ -116,13 +116,14 @@ export default function PromptRewritePopup() {
         {/* Mode Selection */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-900 dark:text-white">Enhancement Mode:</label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(['enhance', 'creative', 'detailed'] as const).map((m) => (
               <Button
                 key={m}
                 variant={mode === m ? "sesh" : "seshOutline"}
                 size="sm"
                 onClick={() => setMode(m)}
+                className="flex-1 sm:flex-none min-w-0"
               >
                 {m.charAt(0).toUpperCase() + m.slice(1)}
               </Button>
@@ -173,11 +174,11 @@ export default function PromptRewritePopup() {
         
         {/* Action Buttons */}
         {upgradedPrompt && !isUpgrading && (
-          <div className="flex gap-2 pt-4">
-            <Button variant="seshOutline" onClick={handleClose} className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-2 pt-4">
+            <Button variant="seshOutline" onClick={handleClose} className="flex-1 order-2 sm:order-1">
               Cancel
             </Button>
-            <Button variant="sesh" onClick={handleAccept} className="flex-1">
+            <Button variant="sesh" onClick={handleAccept} className="flex-1 order-1 sm:order-2">
               Use Enhanced Prompt
             </Button>
           </div>

@@ -26,22 +26,22 @@ function EditPageContent() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
-      <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
+      <div className="container mx-auto px-4 py-6 sm:py-8 h-[calc(100vh-64px)] flex flex-col">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Models</h1>
-          <p className="text-gray-600 dark:text-gray-300">Conversational image editing and generation</p>
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Edit Models</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Conversational image editing and generation</p>
         </div>
 
-        <div className="flex-1 grid lg:grid-cols-3 gap-6 min-h-0">
+        <div className="flex-1 grid lg:grid-cols-3 gap-4 sm:gap-6 min-h-0">
           {/* Model Selection Panel */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 h-fit border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Select Edit Model</h3>
+          <div className="lg:col-span-1 order-2 lg:order-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 h-fit border border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Select Edit Model</h3>
               
               {/* Model Dropdown */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <div className="mb-4 sm:mb-6">
+                <label className="block text-xs sm:text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                   Edit-Capable Models ({models.length})
                 </label>
                 <select
@@ -115,7 +115,7 @@ function EditPageContent() {
           </div>
 
           {/* Chat Interface */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-1 lg:order-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm h-full flex flex-col border border-gray-200 dark:border-gray-700">
               {MODELS[selectedModel] && MODELS[selectedModel].supportsEdit ? (
                 <ChatPanel />
@@ -123,10 +123,10 @@ function EditPageContent() {
                 <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
                   <div className="text-center max-w-md mx-auto p-8">
                     <div className="text-6xl mb-4">🚫</div>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg sm:text-xl font-medium text-gray-900 dark:text-white mb-2">
                       Model Not Edit-Capable
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
                       The selected model doesn't support image editing features.
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">

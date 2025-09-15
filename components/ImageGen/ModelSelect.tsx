@@ -103,7 +103,7 @@ export default function ModelSelect() {
         Select Model
       </label>
       
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {/* Traditional Dropdown */}
         <div className="flex-1">
           <select 
