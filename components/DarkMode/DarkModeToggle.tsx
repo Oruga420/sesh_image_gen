@@ -1,9 +1,23 @@
 'use client';
 
 import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useEffect, useState } from 'react';
 
 export default function DarkModeToggle() {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering after mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Return a placeholder during SSR that matches the initial render
+    return (
+      <div className="p-2 rounded-lg bg-sesh-teal/10 border border-sesh-teal/30 w-9 h-9" />
+    );
+  }
 
   return (
     <button
