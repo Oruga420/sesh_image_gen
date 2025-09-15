@@ -39,33 +39,25 @@ export abstract class BaseModel {
     }
 
     const transformedInput = this.transformInput(input);
-    const body = {
+    
+    // Use the official Replicate client for proper API format
+    const Replicate = (await import('replicate')).default;
+    const replicate = new Replicate({
+      auth: apiToken,
+    });
+    
+    // Use predictions.create for more control over the prediction object
+    const prediction = await replicate.predictions.create({
       model: this.replicateModelPath,
       input: transformedInput,
       stream: true,
-    };
-
-    const response = await fetch("https://api.replicate.com/v1/predictions", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${apiToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
     });
-    
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Replicate error ${response.status}: ${error}`);
-    }
-    
-    const prediction = await response.json();
     
     return {
       id: prediction.id,
       status: prediction.status,
-      streamUrl: prediction?.urls?.stream ?? null,
-      webUrl: prediction?.urls?.get ?? null,
+      streamUrl: prediction.urls?.stream ?? undefined,
+      webUrl: prediction.urls?.get ?? undefined,
     };
   }
 }
