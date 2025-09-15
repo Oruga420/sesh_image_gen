@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import '@/styles/globals.css'
 import NavMenu from '@/components/Navigation/NavMenu'
+import { DarkModeProvider } from '@/contexts/DarkModeContext'
 
 const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({ 
@@ -23,10 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} ${poppins.variable}`}>
-        <NavMenu />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <DarkModeProvider>
+          <NavMenu />
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </DarkModeProvider>
       </body>
     </html>
   )

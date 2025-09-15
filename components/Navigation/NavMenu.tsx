@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import DarkModeToggle from '@/components/DarkMode/DarkModeToggle';
 
 const navigation = [
   { name: 'Home', href: '/', icon: '🏠' },
@@ -13,7 +14,7 @@ export default function NavMenu() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white shadow-sesh border-b border-sesh-teal/20">
+    <nav className="bg-white dark:bg-gray-900 shadow-sesh border-b border-sesh-teal/20 dark:border-sesh-teal/30">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
@@ -35,32 +36,34 @@ export default function NavMenu() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
-                      isActive
-                        ? 'bg-sesh-teal/10 text-sesh-teal border border-sesh-teal/30 shadow-sm'
-                        : 'text-gray-600 hover:text-sesh-purple hover:bg-sesh-teal/5'
-                    }`}
-                  >
-                    <span>{item.icon}</span>
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
+          {/* Center - Navigation Links (Desktop) */}
+          <div className="hidden md:flex items-center space-x-4">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
+                    isActive
+                      ? 'bg-sesh-teal/10 text-sesh-teal dark:bg-sesh-teal/20 dark:text-sesh-teal border border-sesh-teal/30 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-sesh-purple dark:hover:text-sesh-teal hover:bg-sesh-teal/5 dark:hover:bg-sesh-teal/10'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <div className="flex items-center space-x-2">
+          {/* Right - Dark Mode Toggle & Mobile Menu */}
+          <div className="flex items-center space-x-3">
+            {/* Dark Mode Toggle */}
+            <DarkModeToggle />
+            
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex items-center space-x-2">
               {navigation.map((item) => {
                 const isActive = pathname === item.href;
                 return (
@@ -69,8 +72,8 @@ export default function NavMenu() {
                     href={item.href}
                     className={`p-2 rounded-md text-lg transition-colors duration-200 ${
                       isActive
-                        ? 'bg-sesh-teal/10 text-sesh-teal'
-                        : 'text-gray-600 hover:text-sesh-purple hover:bg-sesh-teal/5'
+                        ? 'bg-sesh-teal/10 text-sesh-teal dark:bg-sesh-teal/20 dark:text-sesh-teal'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-sesh-purple dark:hover:text-sesh-teal hover:bg-sesh-teal/5 dark:hover:bg-sesh-teal/10'
                     }`}
                     title={item.name}
                   >
