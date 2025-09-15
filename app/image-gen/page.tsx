@@ -11,7 +11,6 @@ import AspectRatioSelector from "@/components/ImageGen/AspectRatioSelector";
 import ImageRefUploader from "@/components/ImageGen/ImageRefUploader";
 import OutputGrid from "@/components/ImageGen/OutputGrid";
 import PromptRewritePopup from "@/components/PromptUpgrade/PromptRewritePopup";
-import Link from "next/link";
 
 export default function ImageGenPage() {
   const { 
@@ -213,17 +212,12 @@ export default function ImageGenPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 min-h-[calc(100vh-64px)]">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Image Generation</h1>
-            <p className="text-gray-600">Create stunning images with AI</p>
-          </div>
-          <Button variant="outline" asChild>
-            <Link href="/">← Home</Link>
-          </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Image Generation</h1>
+          <p className="text-gray-600">Create stunning images with AI</p>
         </div>
         
         <div className="grid lg:grid-cols-2 gap-8">

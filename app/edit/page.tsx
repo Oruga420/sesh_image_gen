@@ -4,9 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, ModelKey, getModelsList } from "@/lib/models/registry";
-import { Button } from "@/components/ui/button";
 import ChatPanel from "@/components/Edit/ChatPanel";
-import Link from "next/link";
 
 function EditPageContent() {
   const searchParams = useSearchParams();
@@ -27,19 +25,12 @@ function EditPageContent() {
   }, [searchParams, addEditReferenceImage]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 h-screen flex flex-col">
+    <div className="bg-gray-50 min-h-[calc(100vh-64px)]">
+      <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Edit Models</h1>
-            <p className="text-gray-600">Conversational image editing and generation</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link href="/">← Home</Link>
-            </Button>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Edit Models</h1>
+          <p className="text-gray-600">Conversational image editing and generation</p>
         </div>
 
         <div className="flex-1 grid lg:grid-cols-3 gap-6 min-h-0">
