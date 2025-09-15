@@ -1,5 +1,6 @@
 import { BaseModel } from './base';
 import { Imagen4Model } from './imagen4';
+import { Imagen4UltraModel } from './imagen4-ultra';
 import { Imagen4FastModel } from './imagen4-fast';
 import { NanoBananaModel } from './nano-banana';
 import { SeeDream4Model } from './seedream4';
@@ -7,7 +8,7 @@ import { Flux11ProModel } from './flux-1-1-pro';
 import { Flux11ProUltraModel } from './flux-1-1-pro-ultra';
 import { ProteusV03Model } from './proteus-v0-3';
 
-export type ModelKey = 'imagen4' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'proteus_v0_3';
+export type ModelKey = 'imagen4' | 'imagen4_ultra' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'proteus_v0_3';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -15,6 +16,7 @@ class ModelRegistry {
   constructor() {
     // Register all available models
     this.register(new Imagen4Model());
+    this.register(new Imagen4UltraModel());
     this.register(new Imagen4FastModel());
     this.register(new NanoBananaModel());
     this.register(new SeeDream4Model());

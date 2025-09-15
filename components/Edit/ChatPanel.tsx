@@ -68,16 +68,18 @@ export default function ChatPanel() {
       const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
       const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
       
-      if (aspectRatioValue !== '1:1') { // Only add if not default square
-        input.aspect_ratio = aspectRatioValue;
-      }
-      
       // Add custom dimensions if the model supports it
       if (customDimensions.width && customDimensions.height) {
         input.width = customDimensions.width;
         input.height = customDimensions.height;
         if (selectedModel === 'flux_1_1_pro') {
           input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
+        }
+        // For models like proteus_v0_3, don't add aspect_ratio since they only use width/height
+      } else {
+        // For models that use aspect_ratio parameter (not width/height)
+        if (aspectRatioValue !== '1:1') { // Only add if not default square
+          input.aspect_ratio = aspectRatioValue;
         }
       }
 
