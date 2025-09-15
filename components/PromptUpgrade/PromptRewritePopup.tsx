@@ -105,22 +105,22 @@ export default function PromptRewritePopup() {
       onOpenChange={setIsUpgradeOpen}
       className="max-w-2xl"
     >
-      <div className="space-y-4">
+      <div className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Upgrade Your Prompt</h2>
-          <Button variant="ghost" size="sm" onClick={handleClose}>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Upgrade Your Prompt</h2>
+          <Button variant="ghost" size="sm" onClick={handleClose} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
             ✕
           </Button>
         </div>
         
         {/* Mode Selection */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Enhancement Mode:</label>
+          <label className="text-sm font-medium text-gray-900 dark:text-white">Enhancement Mode:</label>
           <div className="flex gap-2">
             {(['enhance', 'creative', 'detailed'] as const).map((m) => (
               <Button
                 key={m}
-                variant={mode === m ? "default" : "outline"}
+                variant={mode === m ? "sesh" : "seshOutline"}
                 size="sm"
                 onClick={() => setMode(m)}
               >
@@ -132,12 +132,13 @@ export default function PromptRewritePopup() {
         
         {/* Original Prompt */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Original Prompt:</label>
+          <label className="text-sm font-medium text-gray-900 dark:text-white">Original Prompt:</label>
           <Textarea
             value={upgradePrompt}
             onChange={(e) => setUpgradePrompt(e.target.value)}
             placeholder="Enter your prompt to enhance..."
             rows={3}
+            className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
           />
         </div>
         
@@ -146,6 +147,7 @@ export default function PromptRewritePopup() {
           onClick={handleUpgrade}
           disabled={isUpgrading || !upgradePrompt.trim()}
           className="w-full"
+          variant="sesh"
         >
           {isUpgrading ? "✨ Enhancing..." : "✨ Enhance Prompt"}
         </Button>
@@ -153,16 +155,16 @@ export default function PromptRewritePopup() {
         {/* Streaming/Result Display */}
         {(streamingText || upgradedPrompt) && (
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <label className="text-sm font-medium text-gray-900 dark:text-white">
               {isUpgrading ? "Enhanced Prompt (Streaming):" : "Enhanced Prompt:"}
             </label>
-            <div className="p-4 bg-gray-50 rounded-lg min-h-[120px] relative">
+            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[120px] relative border border-gray-200 dark:border-gray-600">
               {isUpgrading && (
                 <div className="absolute top-2 right-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-sesh-teal border-t-transparent"></div>
                 </div>
               )}
-              <div className="text-sm whitespace-pre-wrap">
+              <div className="text-sm whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                 {streamingText || upgradedPrompt}
               </div>
             </div>
@@ -172,10 +174,10 @@ export default function PromptRewritePopup() {
         {/* Action Buttons */}
         {upgradedPrompt && !isUpgrading && (
           <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={handleClose} className="flex-1">
+            <Button variant="seshOutline" onClick={handleClose} className="flex-1">
               Cancel
             </Button>
-            <Button onClick={handleAccept} className="flex-1">
+            <Button variant="sesh" onClick={handleAccept} className="flex-1">
               Use Enhanced Prompt
             </Button>
           </div>
