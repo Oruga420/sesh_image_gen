@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { groq } from "@/lib/groq";
+import { createGroqClient } from "@/lib/groq";
 
 export const runtime = "nodejs";
 
@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
       return new Response("Missing rawPrompt", { status: 400 });
     }
 
+    const groq = createGroqClient();
     const stream = await groq.chat.completions.create({
       model: "openai/gpt-oss-20b",
       stream: true,

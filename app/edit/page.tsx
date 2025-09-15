@@ -1,14 +1,14 @@
 'use client';
 
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, getModelsList } from "@/lib/models";
 import { Button } from "@/components/ui/button";
 import ChatPanel from "@/components/Edit/ChatPanel";
 import Link from "next/link";
 
-export default function EditPage() {
+function EditPageContent() {
   const searchParams = useSearchParams();
   const {
     selectedModel,
@@ -98,5 +98,13 @@ export default function EditPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EditPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditPageContent />
+    </Suspense>
   );
 }
