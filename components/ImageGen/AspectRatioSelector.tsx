@@ -32,21 +32,23 @@ export default function AspectRatioSelector() {
 
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">Aspect Ratio</h3>
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Aspect Ratio</h3>
       
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {aspectRatioOptions.map((option) => (
           <Button
             key={option.value}
-            variant={aspectRatio === option.value ? "default" : "outline"}
+            variant={aspectRatio === option.value ? "sesh" : "seshOutline"}
             onClick={() => setAspectRatio(option.value)}
-            className="h-auto p-4 flex flex-col items-center gap-2 text-center"
+            className="h-auto p-3 sm:p-4 flex flex-col items-center gap-2 text-center min-h-[100px] justify-center"
           >
-            <div className="text-2xl">{option.icon}</div>
-            <div className="flex flex-col">
-              <span className="font-medium">{option.label}</span>
+            <div className="text-xl sm:text-2xl">{option.icon}</div>
+            <div className="flex flex-col items-center w-full">
+              <span className="font-medium text-sm sm:text-base">{option.label}</span>
               <span className="text-xs opacity-75">{option.ratio}</span>
-              <span className="text-xs opacity-60 mt-1">{option.description}</span>
+              <span className="text-xs opacity-60 mt-1 leading-tight break-words max-w-full text-center hyphens-auto" style={{wordWrap: 'break-word'}}>
+                {option.description}
+              </span>
             </div>
           </Button>
         ))}
