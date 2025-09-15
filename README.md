@@ -2,7 +2,7 @@
 
 Advanced AI image generation platform with multiple models, editing capabilities, and intelligent prompt enhancement.
 
-## Features
+## Features 2
 
 ### 🎨 Image Generation
 - **Multi-Model Support**: Choose from Imagen 4 Fast and Nano Banana
@@ -172,4 +172,5 @@ Current implementation uses OpenAI-compatible Groq models for fast, cost-effecti
 - [ ] Image-to-image transformations
 - [ ] Voice input for prompts (Whisper integration ready)
 - [ ] Model comparison mode
+
 - [ ] Generation history and favorites
