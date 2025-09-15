@@ -1,7 +1,7 @@
 'use client';
 
 import { useSessionStore } from "@/store/useSessionStore";
-import { MODELS, ModelKey, getModelsList } from "@/lib/models";
+import { MODELS, ModelKey, getModelsList } from "@/lib/models/registry";
 
 export default function ModelSelect() {
   const { selectedModel, setSelectedModel } = useSessionStore();

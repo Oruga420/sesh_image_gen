@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPrediction } from "@/lib/replicate";
-import { MODELS, ModelKey } from "@/lib/models";
+import { modelRegistry, ModelKey } from "@/lib/models/registry";
 
 export const runtime = "nodejs";
 
@@ -8,19 +7,20 @@ export async function POST(req: NextRequest) {
   try {
     const { modelKey, input } = await req.json();
     
-    if (!modelKey || !MODELS[modelKey as ModelKey]) {
-      return NextResponse.json({ error: "Invalid model key" }, { status: 400 });
+    if (!modelKey) {
+      return NextResponse.json({ error: "Missing modelKey" }, { status: 400 });
     }
 
-    const model = MODELS[modelKey as ModelKey];
-    const prediction = await createPrediction(model.replicateModelPath, input, true);
+    // Get the model implementation
+    const model = modelRegistry.getModel(modelKey as ModelKey);
     
-    return NextResponse.json({
-      id: prediction.id,
-      status: prediction.status,
-      streamUrl: prediction?.urls?.stream ?? null,
-      webUrl: prediction?.urls?.get ?? null,
-    });
+    // Validate and transform input using model-specific logic
+    const validatedInput = model.validateInput(input);
+    
+    // Create prediction using the model's implementation
+    const prediction = await model.createPrediction(validatedInput);
+    
+    return NextResponse.json(prediction);
   } catch (error) {
     console.error("Prediction error:", error);
     return NextResponse.json({ 

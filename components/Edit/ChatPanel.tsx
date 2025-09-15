@@ -1,7 +1,7 @@
 'use client';
 
 import { useSessionStore, ChatMessage } from "@/store/useSessionStore";
-import { MODELS } from "@/lib/models";
+import { MODELS } from "@/lib/models/registry";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";

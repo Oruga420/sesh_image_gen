@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ModelKey } from '@/lib/models';
+import { ModelKey } from '@/lib/models/registry';
 
 export interface GeneratedImage {
   id: string;

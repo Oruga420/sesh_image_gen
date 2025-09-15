@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
-import { MODELS, getModelsList } from "@/lib/models";
+import { MODELS, getModelsList } from "@/lib/models/registry";
 import { Button } from "@/components/ui/button";
 import ChatPanel from "@/components/Edit/ChatPanel";
 import Link from "next/link";

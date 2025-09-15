@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
-import { MODELS } from "@/lib/models";
+import { MODELS } from "@/lib/models/registry";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
