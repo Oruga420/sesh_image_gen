@@ -13,16 +13,25 @@ export default function NavMenu() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white shadow-sesh border-b border-sesh-teal/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Sesh
-              </span>
-              <span className="text-sm text-gray-500 font-medium">Image Gen</span>
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img 
+                  src="/sesh-logo.svg" 
+                  alt="Sesh Logo" 
+                  className="w-8 h-8"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-poppins font-bold text-sesh-purple">
+                  Sesh
+                </span>
+                <span className="text-xs text-sesh-teal font-medium -mt-1">Image Gen</span>
+              </div>
             </Link>
           </div>
 
@@ -37,8 +46,8 @@ export default function NavMenu() {
                     href={item.href}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
                       isActive
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        ? 'bg-sesh-teal/10 text-sesh-teal border border-sesh-teal/30 shadow-sm'
+                        : 'text-gray-600 hover:text-sesh-purple hover:bg-sesh-teal/5'
                     }`}
                   >
                     <span>{item.icon}</span>
@@ -60,8 +69,8 @@ export default function NavMenu() {
                     href={item.href}
                     className={`p-2 rounded-md text-lg transition-colors duration-200 ${
                       isActive
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        ? 'bg-sesh-teal/10 text-sesh-teal'
+                        : 'text-gray-600 hover:text-sesh-purple hover:bg-sesh-teal/5'
                     }`}
                     title={item.name}
                   >

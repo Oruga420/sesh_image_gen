@@ -16,6 +16,11 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // Sesh Brand Variants
+        sesh: "bg-sesh-teal text-white hover:bg-sesh-teal/90 shadow-sesh font-medium",
+        seshOutline: "border border-sesh-teal text-sesh-teal bg-transparent hover:bg-sesh-teal hover:text-white transition-all duration-200",
+        seshPurple: "bg-sesh-purple text-white hover:bg-sesh-purple/90 shadow-sesh-lg font-medium",
+        seshYellow: "bg-sesh-yellow text-sesh-purple hover:bg-sesh-yellow/90 font-medium shadow-sm",
       },
       size: {
         default: "h-10 px-4 py-2",
