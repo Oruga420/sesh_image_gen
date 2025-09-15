@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS } from "@/lib/models/registry";
+import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
 import { Button } from "@/components/ui/button";
 import ModelSelect from "@/components/ImageGen/ModelSelect";
 import PromptBox from "@/components/ImageGen/PromptBox";
+import AspectRatioSelector from "@/components/ImageGen/AspectRatioSelector";
 import ImageRefUploader from "@/components/ImageGen/ImageRefUploader";
 import OutputGrid from "@/components/ImageGen/OutputGrid";
 import PromptRewritePopup from "@/components/PromptUpgrade/PromptRewritePopup";
@@ -15,6 +17,7 @@ export default function ImageGenPage() {
   const { 
     selectedModel,
     currentPrompt, 
+    aspectRatio,
     referenceImages,
     isGenerating,
     setIsGenerating,
@@ -39,10 +42,29 @@ export default function ImageGenPage() {
         prompt: currentPrompt,
       };
       
+      // Add aspect ratio support
+      const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
+      const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
+      
+      if (aspectRatioValue !== '1:1') { // Only add if not default square
+        input.aspect_ratio = aspectRatioValue;
+      }
+      
+      // Add custom dimensions if the model supports it
+      if (customDimensions.width && customDimensions.height) {
+        input.width = customDimensions.width;
+        input.height = customDimensions.height;
+        if (selectedModel === 'flux_1_1_pro') {
+          input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
+        }
+      }
+      
       // Add image references if supported
       if (model.supportsImageRef && referenceImages.length > 0) {
-        if (selectedModel === 'nano_banana') {
+        if (selectedModel === 'nano_banana' || selectedModel === 'seedream4') {
           input.image_input = referenceImages;
+        } else if (selectedModel === 'flux_1_1_pro') {
+          input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
         }
       }
       
@@ -194,6 +216,7 @@ export default function ImageGenPage() {
             
             <ModelSelect />
             <PromptBox />
+            <AspectRatioSelector />
             <ImageRefUploader />
             
             {error && (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSessionStore, ChatMessage } from "@/store/useSessionStore";
 import { MODELS } from "@/lib/models/registry";
+import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ImagePreviewModal from "@/components/ui/image-preview-modal";
@@ -14,6 +15,7 @@ export default function ChatPanel() {
     editPrompt,
     editReferenceImages,
     selectedModel,
+    aspectRatio,
     isEditGenerating,
     setEditPrompt,
     addEditMessage,
@@ -62,10 +64,29 @@ export default function ChatPanel() {
         prompt: editPrompt,
       };
 
+      // Add aspect ratio support
+      const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
+      const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
+      
+      if (aspectRatioValue !== '1:1') { // Only add if not default square
+        input.aspect_ratio = aspectRatioValue;
+      }
+      
+      // Add custom dimensions if the model supports it
+      if (customDimensions.width && customDimensions.height) {
+        input.width = customDimensions.width;
+        input.height = customDimensions.height;
+        if (selectedModel === 'flux_1_1_pro') {
+          input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
+        }
+      }
+
       // Add reference images if supported
       if (model.supportsImageRef && editReferenceImages.length > 0) {
-        if (selectedModel === 'nano_banana') {
+        if (selectedModel === 'nano_banana' || selectedModel === 'seedream4') {
           input.image_input = editReferenceImages;
+        } else if (selectedModel === 'flux_1_1_pro') {
+          input.image_prompt = editReferenceImages[0]; // FLUX uses single image_prompt
         }
       }
 
