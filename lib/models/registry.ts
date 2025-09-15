@@ -9,8 +9,10 @@ import { Flux11ProUltraModel } from './flux-1-1-pro-ultra';
 import { ProteusV03Model } from './proteus-v0-3';
 import { IdeogramV3TurboModel } from './ideogram-v3-turbo';
 import { IdeogramV3QualityModel } from './ideogram-v3-quality';
+import { QwenImageModel } from './qwen-image';
+import { FluxKontextMaxModel } from './flux-kontext-max';
 
-export type ModelKey = 'imagen4' | 'imagen4_ultra' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'proteus_v0_3' | 'ideogram_v3_turbo' | 'ideogram_v3_quality';
+export type ModelKey = 'imagen4' | 'imagen4_ultra' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'flux_kontext_max' | 'proteus_v0_3' | 'ideogram_v3_turbo' | 'ideogram_v3_quality' | 'qwen_image';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -27,6 +29,8 @@ class ModelRegistry {
     this.register(new ProteusV03Model());
     this.register(new IdeogramV3TurboModel());
     this.register(new IdeogramV3QualityModel());
+    this.register(new QwenImageModel());
+    this.register(new FluxKontextMaxModel());
   }
 
   private register(model: BaseModel) {

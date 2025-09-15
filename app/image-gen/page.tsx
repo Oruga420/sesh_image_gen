@@ -78,8 +78,10 @@ export default function ImageGenPage() {
       if (model.supportsImageRef && referenceImages.length > 0) {
         if (selectedModel === 'nano_banana' || selectedModel === 'seedream4') {
           input.image_input = referenceImages;
-        } else if (selectedModel === 'flux_1_1_pro') {
+        } else if (selectedModel === 'flux_1_1_pro' || selectedModel === 'flux_1_1_pro_ultra') {
           input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
+        } else if (selectedModel === 'flux_kontext_max') {
+          input.image_prompt = referenceImages[0]; // FLUX Kontext Max uses image_prompt for frontend compatibility
         }
       }
       
