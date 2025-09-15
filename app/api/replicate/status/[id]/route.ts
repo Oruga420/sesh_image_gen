@@ -29,6 +29,15 @@ export async function GET(
     
     const prediction = await replicate.predictions.get(predictionId);
     
+    // Debug logging to see what we're getting
+    console.log(`Status check for ${predictionId}: ${prediction.status}`);
+    if (prediction.output) {
+      console.log(`Output available:`, prediction.output);
+    }
+    if (prediction.error) {
+      console.log(`Error in prediction:`, prediction.error);
+    }
+    
     return NextResponse.json({
       id: prediction.id,
       status: prediction.status,

@@ -92,7 +92,7 @@ export default function ImageGenPage() {
   
   const pollPrediction = async (predictionId: string) => {
     const startTime = Date.now();
-    const maxWaitTime = 5 * 60 * 1000; // 5 minutes max
+    const maxWaitTime = 10 * 60 * 1000; // 10 minutes max
     let pollCount = 0;
     
     // Poll our backend endpoint instead of Replicate directly
@@ -103,7 +103,7 @@ export default function ImageGenPage() {
         
         // Check for timeout
         if (elapsed > maxWaitTime) {
-          throw new Error('Generation timed out after 5 minutes');
+          throw new Error('Generation timed out after 10 minutes. The model may be overloaded or the request may be too complex.');
         }
         
         const response = await fetch(`/api/replicate/status/${predictionId}`);
