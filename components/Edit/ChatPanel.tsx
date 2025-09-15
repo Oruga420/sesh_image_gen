@@ -103,14 +103,27 @@ export default function ChatPanel() {
         
         // Debug logging
         console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
+        console.log(`Poll ${pollCount} - Output:`, prediction.output);
+        console.log(`Poll ${pollCount} - Error:`, prediction.error);
         
         if (prediction.error) {
           throw new Error(prediction.error);
         }
         
-        if (prediction.status === 'succeeded' && prediction.output) {
+        if (prediction.status === 'succeeded') {
+          console.log(`SUCCESS! Prediction ${predictionId} completed`);
+          console.log('Raw output:', prediction.output);
+          console.log('Output type:', typeof prediction.output);
+          console.log('Is array:', Array.isArray(prediction.output));
+          
+          if (!prediction.output) {
+            console.error('No output in successful prediction!');
+            throw new Error('Prediction succeeded but no output was returned');
+          }
+          
           // Handle successful completion
           const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+          console.log('Extracted image URL:', imageUrl);
           
           const assistantMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
@@ -129,8 +142,10 @@ export default function ChatPanel() {
             status: 'completed',
           };
 
+          console.log('Adding message to chat:', assistantMessage);
           addEditMessage(assistantMessage);
           setIsEditGenerating(false);
+          console.log('Image should now appear in chat!');
         } else if (prediction.status === 'failed') {
           throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
         } else if (prediction.status === 'canceled') {
