@@ -91,39 +91,52 @@ export default function ImageGenPage() {
   };
   
   const pollPrediction = async (predictionId: string) => {
-    // Simple polling implementation
+    // Poll our backend endpoint instead of Replicate directly
     const poll = async () => {
       try {
-        const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-          headers: {
-            'Authorization': `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`
-          }
-        });
+        const response = await fetch(`/api/replicate/status/${predictionId}`);
         
-        // Note: This won't work in production due to CORS and exposed token
-        // In real implementation, create a server route for polling
-        console.log('Would poll prediction:', predictionId);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
         
-        // Mock completion for demo
-        setTimeout(() => {
+        const prediction = await response.json();
+        
+        if (prediction.error) {
+          throw new Error(prediction.error);
+        }
+        
+        if (prediction.status === 'succeeded' && prediction.output) {
+          // Handle successful completion
+          const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+          
           addGeneratedImage({
             id: Date.now().toString(),
-            url: 'https://via.placeholder.com/512x512?text=Generated+Image',
+            url: imageUrl,
             prompt: currentPrompt,
             modelKey: selectedModel,
             timestamp: Date.now(),
             predictionId
           });
           setIsGenerating(false);
-        }, 3000);
+        } else if (prediction.status === 'failed') {
+          throw new Error('Generation failed');
+        } else if (prediction.status === 'canceled') {
+          throw new Error('Generation was canceled');
+        } else {
+          // Still in progress, poll again after delay
+          setTimeout(() => poll(), 2000);
+        }
         
       } catch (error) {
         console.error('Polling error:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
         setIsGenerating(false);
       }
     };
     
-    poll();
+    // Start polling with initial delay
+    setTimeout(() => poll(), 1000);
   };
   
   const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
