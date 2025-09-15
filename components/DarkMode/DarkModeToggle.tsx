@@ -1,16 +1,20 @@
 'use client';
 
-import { useDarkMode } from '@/contexts/DarkModeContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { DarkModeContext } from '@/contexts/DarkModeContext';
 
 export default function DarkModeToggle() {
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [mounted, setMounted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const context = useContext(DarkModeContext);
 
   // Prevent hydration mismatch by only rendering after mounting
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (context) {
+      setIsDarkMode(context.isDarkMode);
+    }
+  }, [context]);
 
   if (!mounted) {
     // Return a placeholder during SSR that matches the initial render
@@ -19,9 +23,17 @@ export default function DarkModeToggle() {
     );
   }
 
+  const handleToggle = () => {
+    if (context?.toggleDarkMode) {
+      context.toggleDarkMode();
+    } else {
+      console.warn('Dark mode toggle clicked but no context available');
+    }
+  };
+
   return (
     <button
-      onClick={toggleDarkMode}
+      onClick={handleToggle}
       className="p-2 rounded-lg bg-sesh-teal/10 hover:bg-sesh-teal/20 dark:bg-sesh-teal/20 dark:hover:bg-sesh-teal/30 transition-colors duration-200 border border-sesh-teal/30"
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >

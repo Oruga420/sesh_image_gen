@@ -7,7 +7,7 @@ type DarkModeContextType = {
   toggleDarkMode: () => void;
 };
 
-const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
+export const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
 
 export function DarkModeProvider({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -57,11 +57,14 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
 export function useDarkMode() {
   const context = useContext(DarkModeContext);
   if (context === undefined) {
-    // During SSR or if not wrapped in provider, return safe defaults
-    if (typeof window === 'undefined') {
-      return { isDarkMode: false, toggleDarkMode: () => {} };
-    }
-    throw new Error('useDarkMode must be used within a DarkModeProvider');
+    // Always return safe defaults instead of throwing in production
+    console.warn('useDarkMode used outside DarkModeProvider, using default values');
+    return { 
+      isDarkMode: false, 
+      toggleDarkMode: () => {
+        console.warn('toggleDarkMode called outside DarkModeProvider');
+      }
+    };
   }
   return context;
 }
