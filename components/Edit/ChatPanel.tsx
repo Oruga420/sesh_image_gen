@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from "react";
 import { useSessionStore, ChatMessage } from "@/store/useSessionStore";
 import { MODELS } from "@/lib/models/registry";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import ImagePreviewModal from "@/components/ui/image-preview-modal";
 import Image from "next/image";
 
 export default function ChatPanel() {
@@ -19,6 +21,21 @@ export default function ChatPanel() {
     addEditReferenceImage,
     clearEditHistory,
   } = useSessionStore();
+
+  const [previewImage, setPreviewImage] = useState<{
+    url: string;
+    prompt: string;
+    modelKey: string;
+    timestamp: number;
+  } | null>(null);
+
+  const handleImageClick = (imageUrl: string, prompt: string, modelKey: string, timestamp: number) => {
+    setPreviewImage({ url: imageUrl, prompt, modelKey, timestamp });
+  };
+
+  const closePreview = () => {
+    setPreviewImage(null);
+  };
 
   const handleSubmit = async () => {
     if (!editPrompt.trim()) return;
@@ -261,13 +278,22 @@ export default function ChatPanel() {
                   <div className="grid grid-cols-1 gap-2 mt-2">
                     {message.images.map((img) => (
                       <div key={img.id} className="relative">
-                        <div className="aspect-square relative rounded overflow-hidden">
+                        <div 
+                          className="aspect-square relative rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity group"
+                          onClick={() => handleImageClick(img.url, message.prompt, message.modelKey, message.timestamp)}
+                        >
                           <Image 
                             src={img.url} 
                             alt="Generated"
                             fill
                             className="object-cover"
                           />
+                          {/* Hover overlay */}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 px-3 py-1 rounded text-sm font-medium">
+                              Click to preview
+                            </div>
+                          </div>
                         </div>
                         <div className="flex gap-1 mt-2">
                           <Button size="sm" variant="outline" asChild>
@@ -316,13 +342,23 @@ export default function ChatPanel() {
             <p className="text-sm font-medium mb-2">Reference Images:</p>
             <div className="grid grid-cols-4 gap-2">
               {editReferenceImages.map((img, idx) => (
-                <div key={idx} className="aspect-square relative rounded overflow-hidden">
+                <div 
+                  key={idx} 
+                  className="aspect-square relative rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity group"
+                  onClick={() => handleImageClick(img, 'Reference image', selectedModel, Date.now())}
+                >
                   <Image 
                     src={img} 
                     alt={`Ref ${idx + 1}`}
                     fill
                     className="object-cover"
                   />
+                  {/* Hover overlay for reference images */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 px-2 py-1 rounded text-xs font-medium">
+                      Preview
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -370,6 +406,16 @@ export default function ChatPanel() {
           </div>
         </div>
       </div>
+      
+      {/* Image Preview Modal */}
+      <ImagePreviewModal
+        isOpen={!!previewImage}
+        onClose={closePreview}
+        imageUrl={previewImage?.url || ''}
+        prompt={previewImage?.prompt}
+        modelName={previewImage ? MODELS[previewImage.modelKey]?.name : undefined}
+        timestamp={previewImage?.timestamp}
+      />
     </div>
   );
 }
