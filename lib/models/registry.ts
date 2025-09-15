@@ -8,8 +8,9 @@ import { Flux11ProModel } from './flux-1-1-pro';
 import { Flux11ProUltraModel } from './flux-1-1-pro-ultra';
 import { ProteusV03Model } from './proteus-v0-3';
 import { IdeogramV3TurboModel } from './ideogram-v3-turbo';
+import { IdeogramV3QualityModel } from './ideogram-v3-quality';
 
-export type ModelKey = 'imagen4' | 'imagen4_ultra' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'proteus_v0_3' | 'ideogram_v3_turbo';
+export type ModelKey = 'imagen4' | 'imagen4_ultra' | 'imagen4_fast' | 'nano_banana' | 'seedream4' | 'flux_1_1_pro' | 'flux_1_1_pro_ultra' | 'proteus_v0_3' | 'ideogram_v3_turbo' | 'ideogram_v3_quality';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -25,6 +26,7 @@ class ModelRegistry {
     this.register(new Flux11ProUltraModel());
     this.register(new ProteusV03Model());
     this.register(new IdeogramV3TurboModel());
+    this.register(new IdeogramV3QualityModel());
   }
 
   private register(model: BaseModel) {
