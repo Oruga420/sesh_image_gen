@@ -71,7 +71,7 @@ export default function ImagePreviewModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black bg-opacity-75 backdrop-blur-sm"
@@ -79,100 +79,103 @@ export default function ImagePreviewModal({
       />
       
       {/* Modal Content */}
-      <div className="relative z-10 max-w-6xl max-h-[95vh] mx-4 bg-white rounded-lg overflow-hidden shadow-2xl">
+      <div className="relative z-10 w-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">Image Preview</h3>
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+          <div className="flex-1 min-w-0 pr-3">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">Image Preview</h3>
             {modelName && (
-              <p className="text-sm text-gray-600">Generated with {modelName}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate">Generated with {modelName}</p>
             )}
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-8 w-8 p-0 hover:bg-gray-200 dark:hover:bg-gray-600"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Image Container */}
-        <div className="relative max-h-[70vh] overflow-hidden bg-gray-100">
-          <div className="flex items-center justify-center min-h-[400px]">
+        <div className="relative max-h-[60vh] sm:max-h-[70vh] overflow-hidden bg-gray-100 dark:bg-gray-700">
+          <div className="flex items-center justify-center min-h-[250px] sm:min-h-[400px] p-2 sm:p-4">
             <Image
               src={imageUrl}
               alt="Generated image preview"
               width={1024}
               height={1024}
-              className="max-w-full max-h-[70vh] object-contain"
+              className="max-w-full max-h-[55vh] sm:max-h-[65vh] object-contain rounded-sm"
               priority
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t">
+        <div className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
           {/* Prompt */}
           {prompt && (
-            <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 mb-1">Prompt:</p>
-              <p className="text-sm text-gray-600 bg-white p-3 rounded border">
+            <div className="mb-3 sm:mb-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt:</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 sm:p-3 rounded border border-gray-200 dark:border-gray-600 max-h-20 sm:max-h-24 overflow-y-auto">
                 {prompt}
               </p>
             </div>
           )}
 
           {/* Metadata */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-xs text-gray-500">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-1 sm:gap-0">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {timestamp && (
-                <span>Generated on {new Date(timestamp).toLocaleString()}</span>
+                <span>Generated on {new Date(timestamp).toLocaleDateString()}</span>
               )}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
               Click outside or press ESC to close
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={handleDownload}
-              variant="default"
+              variant="sesh"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
               <Download className="h-4 w-4" />
-              Download
+              <span className="sm:inline">Download</span>
             </Button>
             
             <Button
               onClick={handleOpenInNewTab}
-              variant="outline"
+              variant="seshOutline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
               <ExternalLink className="h-4 w-4" />
-              Open in New Tab
+              <span className="hidden sm:inline">Open in New Tab</span>
+              <span className="sm:hidden">Open</span>
             </Button>
             
             <Button
               onClick={handleCopyUrl}
-              variant="outline"
+              variant="seshOutline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
               {copied ? (
                 <>
                   <Check className="h-4 w-4 text-green-600" />
-                  Copied!
+                  <span className="hidden sm:inline">Copied!</span>
+                  <span className="sm:hidden">✓</span>
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4" />
-                  Copy URL
+                  <span className="hidden sm:inline">Copy URL</span>
+                  <span className="sm:hidden">Copy</span>
                 </>
               )}
             </Button>
