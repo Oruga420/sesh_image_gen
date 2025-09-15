@@ -5,10 +5,16 @@ export async function createPrediction(
   input: Record<string, any>,
   stream = true
 ) {
+  const apiToken = process.env.REPLICATE_API_TOKEN;
+  
+  if (!apiToken) {
+    throw new Error("REPLICATE_API_TOKEN environment variable is not set");
+  }
+
   const r = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
     headers: {
-      Authorization: `Token ${process.env.REPLICATE_API_TOKEN!}`,
+      Authorization: `Token ${apiToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ version, input, stream }),
