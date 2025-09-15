@@ -68,33 +68,71 @@ export default function ChatPanel() {
         throw new Error(prediction.error);
       }
 
-      // For demo purposes, simulate completion
-      setTimeout(() => {
-        const assistantMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          prompt: editPrompt,
-          images: [{
-            id: Date.now().toString(),
-            url: 'https://via.placeholder.com/512x512?text=Edited+Image',
-            prompt: editPrompt,
-            modelKey: selectedModel,
-            timestamp: Date.now(),
-            predictionId: prediction.id || 'demo'
-          }],
-          timestamp: Date.now(),
-          modelKey: selectedModel,
-          status: 'completed',
-        };
-
-        addEditMessage(assistantMessage);
-        setIsEditGenerating(false);
-      }, 3000);
+      // Poll for prediction completion
+      pollPrediction(prediction.id, editPrompt);
 
     } catch (error) {
       console.error('Edit error:', error);
       setIsEditGenerating(false);
     }
+  };
+
+  const pollPrediction = async (predictionId: string, originalPrompt: string) => {
+    // Poll our backend endpoint instead of Replicate directly
+    const poll = async () => {
+      try {
+        const response = await fetch(`/api/replicate/status/${predictionId}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const prediction = await response.json();
+        
+        if (prediction.error) {
+          throw new Error(prediction.error);
+        }
+        
+        if (prediction.status === 'succeeded' && prediction.output) {
+          // Handle successful completion
+          const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+          
+          const assistantMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            prompt: originalPrompt,
+            images: [{
+              id: Date.now().toString(),
+              url: imageUrl,
+              prompt: originalPrompt,
+              modelKey: selectedModel,
+              timestamp: Date.now(),
+              predictionId: predictionId
+            }],
+            timestamp: Date.now(),
+            modelKey: selectedModel,
+            status: 'completed',
+          };
+
+          addEditMessage(assistantMessage);
+          setIsEditGenerating(false);
+        } else if (prediction.status === 'failed') {
+          throw new Error('Generation failed');
+        } else if (prediction.status === 'canceled') {
+          throw new Error('Generation was canceled');
+        } else {
+          // Still in progress, poll again after delay
+          setTimeout(() => poll(), 2000);
+        }
+        
+      } catch (error) {
+        console.error('Polling error:', error);
+        setIsEditGenerating(false);
+      }
+    };
+    
+    // Start polling with initial delay
+    setTimeout(() => poll(), 1000);
   };
 
   const handleImageRefUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
