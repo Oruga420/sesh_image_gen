@@ -3,6 +3,7 @@ import { BaseModel } from './base';
 // FLUX Models (Black Forest Labs)
 import { Flux11ProModel } from './flux-1-1-pro';
 import { Flux11ProUltraModel } from './flux-1-1-pro-ultra';
+import { FluxKontextModel } from './flux-kontext';
 import { FluxKontextMaxModel } from './flux-kontext-max';
 
 // Google Models (Imagen)
@@ -24,6 +25,7 @@ export type ModelKey =
   // FLUX Models
   | 'flux_1_1_pro' 
   | 'flux_1_1_pro_ultra' 
+  | 'flux_kontext'
   | 'flux_kontext_max'
   // Google Models  
   | 'imagen4_fast'
@@ -45,6 +47,7 @@ class ModelRegistry {
     // FLUX Models (Black Forest Labs) - Alphabetical
     this.register(new Flux11ProModel());
     this.register(new Flux11ProUltraModel());
+    this.register(new FluxKontextModel());
     this.register(new FluxKontextMaxModel());
     
     // Google Models (Imagen) - Alphabetical
@@ -85,6 +88,7 @@ class ModelRegistry {
       // FLUX Models
       'flux_1_1_pro',
       'flux_1_1_pro_ultra', 
+      'flux_kontext',
       'flux_kontext_max',
       // Google Models
       'imagen4_fast',
@@ -117,6 +121,7 @@ class ModelRegistry {
       'FLUX Models (Black Forest Labs)': [
         this.getModel('flux_1_1_pro'),
         this.getModel('flux_1_1_pro_ultra'),
+        this.getModel('flux_kontext'),
         this.getModel('flux_kontext_max')
       ],
       'Google Models (Imagen)': [
