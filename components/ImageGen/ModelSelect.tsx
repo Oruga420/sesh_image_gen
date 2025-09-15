@@ -99,7 +99,7 @@ export default function ModelSelect() {
 
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium mb-2">
+      <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">
         Select Model
       </label>
       
@@ -109,7 +109,7 @@ export default function ModelSelect() {
           <select 
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value as ModelKey)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sesh-teal focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
           >
             {models.map((model) => (
               <option key={model.key} value={model.key}>
@@ -134,10 +134,10 @@ export default function ModelSelect() {
               onFocus={() => setIsDropdownOpen(true)}
               onKeyDown={handleKeyDown}
               placeholder="Search models or speak..."
-              className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white pr-10"
+              className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-l-lg focus:ring-2 focus:ring-sesh-teal focus:border-transparent bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 pr-10"
             />
             <div className="absolute inset-y-0 right-14 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -152,26 +152,26 @@ export default function ModelSelect() {
 
           {/* Dropdown Results */}
           {isDropdownOpen && filteredModels.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {filteredModels.map((model, index) => (
                 <div
                   key={model.key}
                   onClick={() => handleSelectModel(model.key as ModelKey)}
-                  className={`px-3 py-2 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                  className={`px-3 py-2 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 ${
                     index === highlightedIndex 
-                      ? 'bg-blue-50 border-blue-200' 
-                      : 'hover:bg-gray-50'
-                  } ${selectedModel === model.key ? 'bg-blue-100' : ''}`}
+                      ? 'bg-sesh-teal/10 dark:bg-sesh-teal/20 border-sesh-teal/30' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  } ${selectedModel === model.key ? 'bg-sesh-teal/20 dark:bg-sesh-teal/30' : ''}`}
                 >
-                  <div className="font-medium text-sm text-gray-900">
+                  <div className="font-medium text-sm text-gray-900 dark:text-white">
                     {model.name}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     ${(model.costPerImage / 100).toFixed(3)} per image • {model.description.substring(0, 80)}...
                   </div>
-                  <div className="flex gap-2 mt-1 text-xs text-gray-400">
-                    {model.supportsImageRef && <span className="text-green-600">📷 Image Ref</span>}
-                    {model.supportsEdit && <span className="text-blue-600">✏️ Edit</span>}
+                  <div className="flex gap-2 mt-1 text-xs text-gray-400 dark:text-gray-500">
+                    {model.supportsImageRef && <span className="text-green-600 dark:text-green-400">📷 Image Ref</span>}
+                    {model.supportsEdit && <span className="text-sesh-purple dark:text-sesh-purple">✏️ Edit</span>}
                   </div>
                 </div>
               ))}
@@ -180,8 +180,8 @@ export default function ModelSelect() {
 
           {/* No Results */}
           {isDropdownOpen && searchQuery && filteredModels.length === 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
-              <div className="text-sm text-gray-500">No models found matching "{searchQuery}"</div>
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-3">
+              <div className="text-sm text-gray-500 dark:text-gray-400">No models found matching "{searchQuery}"</div>
             </div>
           )}
         </div>
@@ -189,25 +189,25 @@ export default function ModelSelect() {
       
       {/* Selected Model Info */}
       {selectedModelInfo && (
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+        <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-sm text-gray-900">{selectedModelInfo.name}</h3>
-            <span className="text-sm font-medium text-green-600">
+            <h3 className="font-medium text-sm text-gray-900 dark:text-white">{selectedModelInfo.name}</h3>
+            <span className="text-sm font-medium text-green-600 dark:text-green-400">
               ${(selectedModelInfo.costPerImage / 100).toFixed(3)} per image
             </span>
           </div>
-          <p className="text-sm text-gray-600 mb-2">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
             {selectedModelInfo.description}
           </p>
-          <div className="flex gap-4 text-xs text-gray-500">
+          <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
-              <span className={selectedModelInfo.supportsImageRef ? "text-green-600" : "text-red-500"}>
+              <span className={selectedModelInfo.supportsImageRef ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>
                 {selectedModelInfo.supportsImageRef ? "✓" : "✗"}
               </span>
               Image Refs
             </span>
             <span className="flex items-center gap-1">
-              <span className={selectedModelInfo.supportsEdit ? "text-green-600" : "text-red-500"}>
+              <span className={selectedModelInfo.supportsEdit ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>
                 {selectedModelInfo.supportsEdit ? "✓" : "✗"}
               </span>
               Edit Support
