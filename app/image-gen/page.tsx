@@ -46,6 +46,13 @@ export default function ImageGenPage() {
       const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
       const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
       
+      // Debug logging for proteus
+      if (selectedModel === 'proteus_v0_3') {
+        console.log('🎌 PROTEUS DEBUG - aspectRatio:', aspectRatio);
+        console.log('🎌 PROTEUS DEBUG - aspectRatioValue:', aspectRatioValue);
+        console.log('🎌 PROTEUS DEBUG - customDimensions:', customDimensions);
+      }
+      
       // Add custom dimensions if the model supports it
       if (customDimensions.width && customDimensions.height) {
         input.width = customDimensions.width;
@@ -54,10 +61,16 @@ export default function ImageGenPage() {
           input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
         }
         // For models like proteus_v0_3, don't add aspect_ratio since they only use width/height
+        if (selectedModel === 'proteus_v0_3') {
+          console.log('🎌 PROTEUS DEBUG - Added width/height, NO aspect_ratio');
+        }
       } else {
         // For models that use aspect_ratio parameter (not width/height)
         if (aspectRatioValue !== '1:1') { // Only add if not default square
           input.aspect_ratio = aspectRatioValue;
+        }
+        if (selectedModel === 'proteus_v0_3') {
+          console.log('🎌 PROTEUS DEBUG - WARNING: No custom dimensions found, falling back to aspect_ratio!');
         }
       }
       
