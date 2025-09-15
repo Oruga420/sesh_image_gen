@@ -212,18 +212,18 @@ export default function ImageGenPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-[calc(100vh-64px)]">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Image Generation</h1>
-          <p className="text-gray-600">Create stunning images with AI</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Image Generation</h1>
+          <p className="text-gray-600 dark:text-gray-300">Create stunning images with AI</p>
         </div>
         
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Controls Panel */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-6">Generation Settings</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Generation Settings</h2>
             
             <ModelSelect />
             <PromptBox />
@@ -231,7 +231,7 @@ export default function ImageGenPage() {
             <ImageRefUploader />
             
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
+              <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300">
                 {error}
               </div>
             )}
@@ -241,13 +241,14 @@ export default function ImageGenPage() {
               disabled={isGenerating || !currentPrompt.trim()}
               className="w-full"
               size="lg"
+              variant="sesh"
             >
               {isGenerating ? "Generating..." : "Generate Image"}
             </Button>
           </div>
           
           {/* Output Panel */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <OutputGrid />
           </div>
         </div>
