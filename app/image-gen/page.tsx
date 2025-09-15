@@ -91,9 +91,21 @@ export default function ImageGenPage() {
   };
   
   const pollPrediction = async (predictionId: string) => {
+    const startTime = Date.now();
+    const maxWaitTime = 5 * 60 * 1000; // 5 minutes max
+    let pollCount = 0;
+    
     // Poll our backend endpoint instead of Replicate directly
     const poll = async () => {
       try {
+        pollCount++;
+        const elapsed = Date.now() - startTime;
+        
+        // Check for timeout
+        if (elapsed > maxWaitTime) {
+          throw new Error('Generation timed out after 5 minutes');
+        }
+        
         const response = await fetch(`/api/replicate/status/${predictionId}`);
         
         if (!response.ok) {
@@ -101,6 +113,9 @@ export default function ImageGenPage() {
         }
         
         const prediction = await response.json();
+        
+        // Debug logging
+        console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
         
         if (prediction.error) {
           throw new Error(prediction.error);
@@ -120,12 +135,14 @@ export default function ImageGenPage() {
           });
           setIsGenerating(false);
         } else if (prediction.status === 'failed') {
-          throw new Error('Generation failed');
+          throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
         } else if (prediction.status === 'canceled') {
           throw new Error('Generation was canceled');
         } else {
           // Still in progress, poll again after delay
-          setTimeout(() => poll(), 2000);
+          // Increase polling interval for long-running predictions
+          const delay = pollCount > 30 ? 5000 : 2000; // 5s after 1 minute, 2s before
+          setTimeout(() => poll(), delay);
         }
         
       } catch (error) {
