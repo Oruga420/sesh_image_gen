@@ -13,15 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const model = MODELS[modelKey as ModelKey];
-    const version = process.env[model.versionEnv];
-    
-    if (!version) {
-      return NextResponse.json({ 
-        error: `Missing environment variable: ${model.versionEnv}` 
-      }, { status: 500 });
-    }
-    
-    const prediction = await createPrediction(version, input, true);
+    const prediction = await createPrediction(model.replicateModelPath, input, true);
     
     return NextResponse.json({
       id: prediction.id,

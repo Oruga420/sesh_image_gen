@@ -1,7 +1,7 @@
 export const REPLICATE_API = "https://api.replicate.com/v1";
 
 export async function createPrediction(
-  version: string,
+  modelPath: string,
   input: Record<string, any>,
   stream = true
 ) {
@@ -11,13 +11,19 @@ export async function createPrediction(
     throw new Error("REPLICATE_API_TOKEN environment variable is not set");
   }
 
+  const body = {
+    model: modelPath,
+    input,
+    stream,
+  };
+
   const r = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
     headers: {
       Authorization: `Token ${apiToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ version, input, stream }),
+    body: JSON.stringify(body),
   });
   
   if (!r.ok) {

@@ -5,7 +5,6 @@ export type ModelKey =
 
 export const MODELS: Record<ModelKey, {
   replicateModelPath: string;   // e.g. "google/imagen-4-fast"
-  versionEnv: string;           // e.g. "REPLICATE_MODEL_IMAGEN4_FAST_VERSION"
   supportsImageRef: boolean;    // enable/disable uploader
   supportsEdit: boolean;        // show Edit tab affordances
   defaultSize: string;          // UI preset
@@ -15,7 +14,6 @@ export const MODELS: Record<ModelKey, {
 }> = {
   imagen4_fast: {
     replicateModelPath: "google/imagen-4-fast",
-    versionEnv: "REPLICATE_MODEL_IMAGEN4_FAST_VERSION",
     supportsImageRef: false,    
     supportsEdit: false,
     defaultSize: "1024x1024",
@@ -25,7 +23,6 @@ export const MODELS: Record<ModelKey, {
   },
   nano_banana: {
     replicateModelPath: "google/nano-banana", 
-    versionEnv: "REPLICATE_MODEL_NANO_BANANA_VERSION",
     supportsImageRef: true,     // edit image input
     supportsEdit: true,
     defaultSize: "1024x1024",
@@ -33,15 +30,6 @@ export const MODELS: Record<ModelKey, {
     description: "Google's image editing model in Gemini 2.5",
     costPerImage: 3.9, // $0.039
   },
-};
-
-export const getModelVersion = (modelKey: ModelKey): string => {
-  const model = MODELS[modelKey];
-  const version = process.env[model.versionEnv];
-  if (!version) {
-    throw new Error(`Missing environment variable: ${model.versionEnv}`);
-  }
-  return version;
 };
 
 export const getModelsList = () => {
