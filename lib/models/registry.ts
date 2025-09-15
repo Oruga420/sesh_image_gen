@@ -1,8 +1,9 @@
 import { BaseModel } from './base';
 import { Imagen4FastModel } from './imagen4-fast';
 import { NanoBananaModel } from './nano-banana';
+import { SeeDream4Model } from './seedream4';
 
-export type ModelKey = 'imagen4_fast' | 'nano_banana';
+export type ModelKey = 'imagen4_fast' | 'nano_banana' | 'seedream4';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -11,6 +12,7 @@ class ModelRegistry {
     // Register all available models
     this.register(new Imagen4FastModel());
     this.register(new NanoBananaModel());
+    this.register(new SeeDream4Model());
   }
 
   private register(model: BaseModel) {
