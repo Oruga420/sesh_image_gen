@@ -20,11 +20,11 @@ export default function NavMenu() {
           {/* Logo/Brand */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sesh-teal to-sesh-purple flex items-center justify-center shadow-sm">
                 <img 
                   src="/sesh-logo.svg" 
                   alt="Sesh Logo" 
-                  className="w-8 h-8"
+                  className="w-6 h-6"
                 />
               </div>
               <div className="flex flex-col">
