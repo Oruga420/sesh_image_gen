@@ -40,18 +40,27 @@ export abstract class BaseModel {
 
     const transformedInput = this.transformInput(input);
     
+    console.log("BaseModel - transformedInput:", transformedInput);
+    console.log("BaseModel - replicateModelPath:", this.replicateModelPath);
+    
     // Use the official Replicate client for proper API format
     const Replicate = (await import('replicate')).default;
     const replicate = new Replicate({
       auth: apiToken,
     });
     
-    // Use predictions.create for more control over the prediction object
-    const prediction = await replicate.predictions.create({
+    const requestBody = {
       model: this.replicateModelPath,
       input: transformedInput,
       stream: true,
-    });
+    };
+    
+    console.log("BaseModel - Replicate request body:", requestBody);
+    
+    // Use predictions.create for more control over the prediction object
+    const prediction = await replicate.predictions.create(requestBody);
+    
+    console.log("BaseModel - Raw prediction response:", prediction);
     
     return {
       id: prediction.id,
