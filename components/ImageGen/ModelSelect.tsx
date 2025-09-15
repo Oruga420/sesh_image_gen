@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, ModelKey, getModelsList } from "@/lib/models/registry";
+import VoiceRecorder from "@/components/VoiceSearch/VoiceRecorder";
+import { useVoiceSearch } from "@/hooks/useVoiceSearch";
 
 export default function ModelSelect() {
   const { selectedModel, setSelectedModel } = useSessionStore();
@@ -27,6 +29,21 @@ export default function ModelSelect() {
     setIsDropdownOpen(false);
     setHighlightedIndex(-1);
   };
+
+  // Voice search integration
+  const { handleTranscript, handleError } = useVoiceSearch({
+    onTranscript: (text: string) => {
+      setSearchQuery(text);
+      setIsDropdownOpen(true);
+      setHighlightedIndex(-1);
+      // Focus the input after transcription
+      setTimeout(() => inputRef.current?.focus(), 100);
+    },
+    onError: (error: string) => {
+      console.error('Voice search error:', error);
+      // Silently handle errors to not break the UI
+    }
+  });
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -104,7 +121,7 @@ export default function ModelSelect() {
 
         {/* Search Bar with Autocomplete */}
         <div className="flex-1 relative" ref={dropdownRef}>
-          <div className="relative">
+          <div className="relative flex">
             <input
               ref={inputRef}
               type="text"
@@ -116,14 +133,21 @@ export default function ModelSelect() {
               }}
               onFocus={() => setIsDropdownOpen(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Search models..."
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white pr-10"
+              placeholder="Search models or speak..."
+              className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white pr-10"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <div className="absolute inset-y-0 right-14 flex items-center pr-3 pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
+            
+            {/* Voice Recording Button - Isolated Component */}
+            <VoiceRecorder
+              onTranscript={handleTranscript}
+              onError={handleError}
+              className="border-l-0"
+            />
           </div>
 
           {/* Dropdown Results */}
