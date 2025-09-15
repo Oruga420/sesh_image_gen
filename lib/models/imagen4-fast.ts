@@ -24,24 +24,37 @@ export class Imagen4FastModel extends BaseModel {
   };
 
   validateInput(input: any): Imagen4FastInput {
+    console.log("\n🔍 IMAGEN4-FAST INPUT VALIDATION:");
+    console.log("Raw input:", JSON.stringify(input, null, 2));
+    
     if (!input.prompt || typeof input.prompt !== 'string') {
+      console.error("❌ Invalid prompt:", input.prompt);
       throw new Error('prompt is required and must be a string');
     }
 
-    return {
+    const validated = {
       prompt: input.prompt,
       aspect_ratio: input.aspect_ratio || '1:1',
       output_format: input.output_format || 'jpg',
       safety_filter_level: input.safety_filter_level || 'block_only_high',
     };
+    
+    console.log("✅ Validated input:", JSON.stringify(validated, null, 2));
+    return validated;
   }
 
   transformInput(input: Imagen4FastInput): Record<string, any> {
-    return {
+    console.log("\n🔄 IMAGEN4-FAST INPUT TRANSFORMATION:");
+    console.log("Input to transform:", JSON.stringify(input, null, 2));
+    
+    const transformed = {
       prompt: input.prompt,
       aspect_ratio: input.aspect_ratio,
       output_format: input.output_format,
       safety_filter_level: input.safety_filter_level,
     };
+    
+    console.log("✅ Transformed for Replicate:", JSON.stringify(transformed, null, 2));
+    return transformed;
   }
 }
