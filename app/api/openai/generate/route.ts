@@ -73,10 +73,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract image data
-    const images = response.data.map((item) => ({
+    const images = response.data?.map((item) => ({
       b64_json: item.b64_json,
       revised_prompt: item.revised_prompt,
-    }));
+    })) || [];
 
     return NextResponse.json({
       success: true,
