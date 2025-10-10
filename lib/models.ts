@@ -54,6 +54,12 @@ export const MODELS: Record<ModelKey, {
 
 export const getModelVersion = (modelKey: ModelKey): string => {
   const model = MODELS[modelKey];
+
+  // OpenAI models don't use version env vars
+  if (model.provider === "openai" || !model.versionEnv) {
+    throw new Error(`Model ${modelKey} does not use version environment variables`);
+  }
+
   const version = process.env[model.versionEnv];
   if (!version) {
     throw new Error(`Missing environment variable: ${model.versionEnv}`);
