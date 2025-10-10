@@ -13,11 +13,20 @@ export async function POST(req: NextRequest) {
     }
 
     const model = MODELS[modelKey as ModelKey];
+
+    // Ensure this is a Replicate model
+    if (model.provider !== "replicate" || !model.versionEnv) {
+      return NextResponse.json(
+        { error: "This endpoint only supports Replicate models" },
+        { status: 400 }
+      );
+    }
+
     const version = process.env[model.versionEnv];
-    
+
     if (!version) {
-      return NextResponse.json({ 
-        error: `Missing environment variable: ${model.versionEnv}` 
+      return NextResponse.json({
+        error: `Missing environment variable: ${model.versionEnv}`
       }, { status: 500 });
     }
     
