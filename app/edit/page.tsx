@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -8,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import ChatPanel from "@/components/Edit/ChatPanel";
 import Link from "next/link";
 
-export default function EditPage() {
+function EditPageContent() {
   const searchParams = useSearchParams();
   const {
     selectedModel,
     setSelectedModel,
     addEditReferenceImage,
   } = useSessionStore();
-  
+
   const models = getModelsList().filter(m => m.supportsEdit);
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export default function EditPage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="font-semibold mb-4">Edit-Capable Models</h3>
-              
+
               <div className="space-y-2">
                 {models.map((model) => (
                   <button
@@ -69,10 +70,10 @@ export default function EditPage() {
                   </button>
                 ))}
               </div>
-              
+
               <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-sm text-yellow-800">
-                  💡 <strong>Tip:</strong> Chat history is cleared on page reload. 
+                  💡 <strong>Tip:</strong> Chat history is cleared on page reload.
                   All conversations are ephemeral by design.
                 </p>
               </div>
@@ -98,5 +99,13 @@ export default function EditPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EditPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <EditPageContent />
+    </Suspense>
   );
 }
