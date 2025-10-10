@@ -7,7 +7,8 @@ export interface GeneratedImage {
   prompt: string;
   modelKey: ModelKey;
   timestamp: number;
-  predictionId: string;
+  predictionId?: string;
+  revisedPrompt?: string;
 }
 
 export interface ChatMessage {
