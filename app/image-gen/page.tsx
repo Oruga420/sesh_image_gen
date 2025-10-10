@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
-import { MODELS } from "@/lib/models";
+import { MODELS, ModelKey } from "@/lib/models";
 import { Button } from "@/components/ui/button";
 import ModelSelect from "@/components/ImageGen/ModelSelect";
 import PromptBox from "@/components/ImageGen/PromptBox";
