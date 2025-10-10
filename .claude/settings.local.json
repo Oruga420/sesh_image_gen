@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx next dev:*)",
+      "Bash(export NVM_DIR=\"$HOME/.nvm\")",
+      "Bash([ -s \"$NVM_DIR/nvm.sh\" ])",
+      "Bash(. \"$NVM_DIR/nvm.sh\")",
+      "Bash(nvm install:*)",
+      "Bash(nvm use:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "Bash(git pull:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
