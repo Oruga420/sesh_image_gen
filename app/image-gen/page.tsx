@@ -101,6 +101,7 @@ export default function ImageGenPage() {
   };
 
   const handleReplicateGenerate = async (model: typeof MODELS[ModelKey]) => {
+    console.log('🚀 Starting Replicate generation for model:', selectedModel);
     const input: Record<string, any> = {
       prompt: currentPrompt,
     };
@@ -108,6 +109,7 @@ export default function ImageGenPage() {
     // Add aspect ratio support
     const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
     const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
+    console.log('📐 Aspect ratio:', aspectRatio, 'Value:', aspectRatioValue, 'Dimensions:', customDimensions);
 
     // Add custom dimensions if the model supports it
     if (customDimensions.width && customDimensions.height) {
@@ -134,6 +136,8 @@ export default function ImageGenPage() {
       }
     }
 
+    console.log('📤 Sending request to /api/replicate/predict with input:', input);
+
     // Start prediction
     const response = await fetch('/api/replicate/predict', {
       method: 'POST',
@@ -144,32 +148,24 @@ export default function ImageGenPage() {
       })
     });
 
+    console.log('📥 Prediction response status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Prediction request failed:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const prediction = await response.json();
+    console.log('✅ Prediction created:', prediction);
 
     if (prediction.error) {
       throw new Error(prediction.error);
     }
 
-    // Watch stream if available
-    if (prediction.streamUrl) {
-      watchReplicateStream(
-        prediction.streamUrl,
-        (data) => {
-          console.log('Stream data:', data);
-        },
-        () => {
-          // When completed, poll for final result
-          pollPrediction(prediction.id);
-        }
-      );
-    } else {
-      // Fallback to polling
-      pollPrediction(prediction.id);
-    }
+    // Always use polling (streamUrl causes CORS issues)
+    console.log('⏳ Starting polling for prediction ID:', prediction.id);
+    pollPrediction(prediction.id);
   };
   
   const pollPrediction = async (predictionId: string) => {
@@ -206,15 +202,18 @@ export default function ImageGenPage() {
         if (prediction.status === 'succeeded' && prediction.output) {
           // Handle successful completion
           const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+          console.log('🎉 Generation succeeded! Image URL:', imageUrl);
 
-          addGeneratedImage({
+          const imageData = {
             id: Date.now().toString(),
             url: imageUrl,
             prompt: currentPrompt,
             modelKey: selectedModel,
             timestamp: Date.now(),
             predictionId
-          });
+          };
+          console.log('💾 Adding image to store:', imageData);
+          addGeneratedImage(imageData);
           setIsGenerating(false);
         } else if (prediction.status === 'failed') {
           throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
