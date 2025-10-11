@@ -22,10 +22,13 @@ export interface ChatMessage {
   status: 'generating' | 'completed' | 'failed';
 }
 
+export type AspectRatio = 'square' | 'landscape' | 'portrait';
+
 export interface SessionStore {
   // Image Gen Screen State
   selectedModel: ModelKey;
   currentPrompt: string;
+  aspectRatio: AspectRatio;
   referenceImages: string[];
   isGenerating: boolean;
   generatedImages: GeneratedImage[];
@@ -45,6 +48,7 @@ export interface SessionStore {
   // Actions
   setSelectedModel: (model: ModelKey) => void;
   setCurrentPrompt: (prompt: string) => void;
+  setAspectRatio: (ratio: AspectRatio) => void;
   setReferenceImages: (images: string[]) => void;
   addReferenceImage: (imageUrl: string) => void;
   removeReferenceImage: (index: number) => void;
@@ -72,6 +76,7 @@ export interface SessionStore {
 const initialState = {
   selectedModel: 'imagen4_fast' as ModelKey,
   currentPrompt: '',
+  aspectRatio: 'square' as AspectRatio,
   referenceImages: [],
   isGenerating: false,
   generatedImages: [],
@@ -89,9 +94,10 @@ const initialState = {
 
 export const useSessionStore = create<SessionStore>((set, get) => ({
   ...initialState,
-  
+
   setSelectedModel: (model) => set({ selectedModel: model }),
   setCurrentPrompt: (prompt) => set({ currentPrompt: prompt }),
+  setAspectRatio: (ratio) => set({ aspectRatio: ratio }),
   setReferenceImages: (images) => set({ referenceImages: images }),
   addReferenceImage: (imageUrl) => 
     set((state) => ({ 
