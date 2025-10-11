@@ -42,7 +42,12 @@ export class GPTImage1Model extends BaseModel {
   }
 
   async createPrediction(input: ModelInput): Promise<any> {
-    // OpenAI models use a different API, so this is handled separately
-    throw new Error('GPT Image models should use the /api/openai/generate endpoint');
+    // OpenAI models don't use Replicate's prediction API
+    // This method should not be called - use /api/openai/generate endpoint instead
+    return {
+      id: 'openai-not-supported',
+      status: 'error',
+      error: 'GPT Image models should use the /api/openai/generate endpoint'
+    };
   }
 }
