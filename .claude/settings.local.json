@@ -22,7 +22,11 @@
       "Bash(sed:*)",
       "Bash(npx tsc:*)",
       "Bash(curl:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git fetch:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": []
