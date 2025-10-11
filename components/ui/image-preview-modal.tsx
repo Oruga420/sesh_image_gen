@@ -150,7 +150,7 @@ export default function ImagePreviewModal({
             
             <Button
               onClick={handleOpenInNewTab}
-              variant="seshOutline"
+              variant="outline"
               size="sm"
               className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
@@ -158,10 +158,10 @@ export default function ImagePreviewModal({
               <span className="hidden sm:inline">Open in New Tab</span>
               <span className="sm:hidden">Open</span>
             </Button>
-            
+
             <Button
               onClick={handleCopyUrl}
-              variant="seshOutline"
+              variant="outline"
               size="sm"
               className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >

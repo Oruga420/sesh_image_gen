@@ -77,13 +77,13 @@ export default function OutputGrid() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="seshOutline" size="sm" asChild className="flex-1 sm:flex-none">
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                   <a href={image.url} download target="_blank">
                     Download
                   </a>
                 </Button>
-                
-                <Button variant="seshOutline" size="sm" asChild className="flex-1 sm:flex-none">
+
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                   <Link href={`/edit?ref=${encodeURIComponent(image.url)}`}>
                     Edit
                   </Link>
