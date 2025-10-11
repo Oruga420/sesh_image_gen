@@ -72,11 +72,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Extract image data
-    const images = response.data?.map((item) => ({
-      b64_json: item.b64_json,
-      revised_prompt: item.revised_prompt,
-    })) || [];
+    // Extract image data - convert URL to base64
+    const images = await Promise.all(
+      (response.data || []).map(async (item) => {
+        let b64_json = item.b64_json;
+
+        // If we got a URL instead of b64, fetch and convert
+        if (!b64_json && item.url) {
+          const imageResponse = await fetch(item.url);
+          const arrayBuffer = await imageResponse.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          b64_json = buffer.toString('base64');
+        }
+
+        return {
+          b64_json,
+          revised_prompt: item.revised_prompt,
+        };
+      })
+    );
 
     return NextResponse.json({
       success: true,

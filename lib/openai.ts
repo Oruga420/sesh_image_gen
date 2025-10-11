@@ -41,7 +41,6 @@ export async function generateImage(
     prompt,
     size: finalOptions.size,
     quality: finalOptions.quality,
-    response_format: 'b64_json',
   };
 
   // Add optional parameters
@@ -90,7 +89,6 @@ export async function editImage(
     image: imageUrl,
     size: finalOptions.size,
     quality: finalOptions.quality,
-    response_format: 'b64_json',
   };
 
   // Add optional parameters
