@@ -63,13 +63,17 @@ export async function POST(req: NextRequest) {
       );
     } else {
       // Use generation endpoint
-      response = await generateImage(prompt, {
-        size: size || "1024x1024",
-        quality: quality || "auto",
-        output_format: output_format || "png",
-        output_compression,
-        background: background || "auto",
-      });
+      response = await generateImage(
+        prompt,
+        model.openaiModel as 'gpt-image-1' | 'dall-e-3' | 'dall-e-2',
+        {
+          size: size || "1024x1024",
+          quality: quality || "auto",
+          output_format: output_format || "png",
+          output_compression,
+          background: background || "auto",
+        }
+      );
     }
 
     // Extract image data - convert URL to base64

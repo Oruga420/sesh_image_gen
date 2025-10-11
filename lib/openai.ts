@@ -13,9 +13,10 @@ export const getOpenAIClient = () => {
   });
 };
 
-// Generate image with GPT Image 1
+// Generate image with OpenAI models (gpt-image-1, dall-e-3, dall-e-2)
 export async function generateImage(
   prompt: string,
+  model: 'gpt-image-1' | 'dall-e-3' | 'dall-e-2',
   options?: {
     size?: '1024x1024' | '1024x1536' | '1536x1024';
     quality?: 'low' | 'medium' | 'high' | 'auto';
@@ -37,21 +38,27 @@ export async function generateImage(
   const finalOptions: any = { ...defaultOptions, ...options };
 
   const requestBody: any = {
-    model: 'gpt-image-1',
+    model,
     prompt,
     size: finalOptions.size,
-    quality: finalOptions.quality,
   };
 
-  // Add optional parameters
-  if (finalOptions.output_format && finalOptions.output_format !== 'png') {
-    requestBody.output_format = finalOptions.output_format;
+  // Only add quality for gpt-image-1 (DALL-E doesn't support it)
+  if (model === 'gpt-image-1') {
+    requestBody.quality = finalOptions.quality;
   }
-  if (finalOptions.output_compression) {
-    requestBody.output_compression = finalOptions.output_compression;
-  }
-  if (finalOptions.background && finalOptions.background !== 'auto') {
-    requestBody.background = finalOptions.background;
+
+  // Add optional parameters (only for gpt-image-1)
+  if (model === 'gpt-image-1') {
+    if (finalOptions.output_format && finalOptions.output_format !== 'png') {
+      requestBody.output_format = finalOptions.output_format;
+    }
+    if (finalOptions.output_compression) {
+      requestBody.output_compression = finalOptions.output_compression;
+    }
+    if (finalOptions.background && finalOptions.background !== 'auto') {
+      requestBody.background = finalOptions.background;
+    }
   }
 
   const response = await client.images.generate(requestBody);

@@ -28,7 +28,8 @@
       "Bash(git fetch:*)",
       "Bash(git ls-tree:*)",
       "Bash(timeout 5 curl http://localhost:3000/image-gen)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
