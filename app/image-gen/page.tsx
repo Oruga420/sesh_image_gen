@@ -148,39 +148,69 @@ export default function ImageGenPage() {
   };
   
   const pollPrediction = async (predictionId: string) => {
-    // Simple polling implementation
+    const startTime = Date.now();
+    const maxWaitTime = 10 * 60 * 1000; // 10 minutes max
+    let pollCount = 0;
+
+    // Poll our backend endpoint instead of Replicate directly
     const poll = async () => {
       try {
-        const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-          headers: {
-            'Authorization': `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`
-          }
-        });
-        
-        // Note: This won't work in production due to CORS and exposed token
-        // In real implementation, create a server route for polling
-        console.log('Would poll prediction:', predictionId);
-        
-        // Mock completion for demo
-        setTimeout(() => {
+        pollCount++;
+        const elapsed = Date.now() - startTime;
+
+        // Check for timeout
+        if (elapsed > maxWaitTime) {
+          throw new Error('Generation timed out after 10 minutes. The model may be overloaded or the request may be too complex.');
+        }
+
+        const response = await fetch(`/api/replicate/status/${predictionId}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const prediction = await response.json();
+
+        // Debug logging
+        console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
+
+        if (prediction.error) {
+          throw new Error(prediction.error);
+        }
+
+        if (prediction.status === 'succeeded' && prediction.output) {
+          // Handle successful completion
+          const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+
           addGeneratedImage({
             id: Date.now().toString(),
-            url: 'https://via.placeholder.com/512x512?text=Generated+Image',
+            url: imageUrl,
             prompt: currentPrompt,
             modelKey: selectedModel,
             timestamp: Date.now(),
             predictionId
           });
           setIsGenerating(false);
-        }, 3000);
-        
+        } else if (prediction.status === 'failed') {
+          throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
+        } else if (prediction.status === 'canceled') {
+          throw new Error('Generation was canceled');
+        } else {
+          // Still in progress, poll again after delay
+          // Increase polling interval for long-running predictions
+          const delay = pollCount > 30 ? 5000 : 2000; // 5s after 1 minute, 2s before
+          setTimeout(() => poll(), delay);
+        }
+
       } catch (error) {
         console.error('Polling error:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
         setIsGenerating(false);
       }
     };
-    
-    poll();
+
+    // Start polling with initial delay
+    setTimeout(() => poll(), 1000);
   };
   
   const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
