@@ -82,13 +82,14 @@ export default function ImageGenPage() {
     }
 
     // Add generated images to store
+    const baseTimestamp = Date.now();
     result.images.forEach((img: any, index: number) => {
       addGeneratedImage({
-        id: `${Date.now()}-${index}`,
+        id: `${baseTimestamp}-${index}`,
         url: `data:image/png;base64,${img.b64_json}`,
         prompt: currentPrompt,
         modelKey: selectedModel,
-        timestamp: Date.now(),
+        timestamp: baseTimestamp + index, // Slightly different timestamps
         revisedPrompt: img.revised_prompt,
       });
     });
