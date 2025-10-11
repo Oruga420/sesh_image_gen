@@ -140,7 +140,7 @@ export default function ImagePreviewModal({
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={handleDownload}
-              variant="sesh"
+              variant="default"
               size="sm"
               className="flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
