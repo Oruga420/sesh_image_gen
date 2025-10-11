@@ -1,47 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPrediction } from "@/lib/replicate";
-import { MODELS, ModelKey } from "@/lib/models";
+import { modelRegistry, ModelKey } from "@/lib/models";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
     const { modelKey, input } = await req.json();
-    
-    if (!modelKey || !MODELS[modelKey as ModelKey]) {
+
+    if (!modelKey) {
       return NextResponse.json({ error: "Invalid model key" }, { status: 400 });
     }
 
-    const model = MODELS[modelKey as ModelKey];
+    // Get the model from registry
+    const model = modelRegistry.getModel(modelKey as ModelKey);
 
-    // Ensure this is a Replicate model
-    if (model.provider !== "replicate" || !model.versionEnv) {
+    // Ensure this is a Replicate model (not OpenAI)
+    if ((model as any).provider === "openai") {
       return NextResponse.json(
         { error: "This endpoint only supports Replicate models" },
         { status: 400 }
       );
     }
 
-    const version = process.env[model.versionEnv];
+    // Validate input
+    const validatedInput = model.validateInput(input);
 
-    if (!version) {
-      return NextResponse.json({
-        error: `Missing environment variable: ${model.versionEnv}`
-      }, { status: 500 });
-    }
-    
-    const prediction = await createPrediction(version, input, true);
-    
+    // Create prediction using the model's method
+    const prediction = await model.createPrediction(validatedInput);
+
     return NextResponse.json({
       id: prediction.id,
       status: prediction.status,
-      streamUrl: prediction?.urls?.stream ?? null,
-      webUrl: prediction?.urls?.get ?? null,
+      streamUrl: prediction.streamUrl ?? null,
+      webUrl: prediction.webUrl ?? null,
     });
   } catch (error) {
     console.error("Prediction error:", error);
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : "Unknown error" 
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 });
   }
 }
