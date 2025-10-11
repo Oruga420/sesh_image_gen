@@ -18,6 +18,24 @@ export class DallE2Model extends BaseModel {
     defaultSize: '1024x1024',
   };
 
+  validateInput(input: any): ModelInput {
+    if (!input.prompt || typeof input.prompt !== 'string') {
+      throw new Error('prompt is required and must be a string');
+    }
+
+    return {
+      prompt: input.prompt,
+      image_input: input.image_input,
+      mask: input.mask,
+      size: input.size || '1024x1024',
+    };
+  }
+
+  transformInput(input: ModelInput): Record<string, any> {
+    // OpenAI-specific transformation handled in the API route
+    return input as Record<string, any>;
+  }
+
   async createPrediction(input: ModelInput): Promise<any> {
     // Returns error object instead of throwing (to allow model registration)
     return {
