@@ -23,8 +23,6 @@ import { SeeDream4Model } from './seedream4';
 
 // OpenAI Models
 import { GPTImage1Model } from './gpt-image-1';
-import { DallE3Model } from './dall-e-3';
-import { DallE2Model } from './dall-e-2';
 
 export type ModelKey =
   // FLUX Models
@@ -45,9 +43,7 @@ export type ModelKey =
   | 'qwen_image'
   | 'seedream4'
   // OpenAI Models
-  | 'gpt_image_1'
-  | 'dall_e_3'
-  | 'dall_e_2';
+  | 'gpt_image_1';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -74,9 +70,7 @@ class ModelRegistry {
     this.register(new QwenImageModel());
     this.register(new SeeDream4Model());
 
-    // OpenAI Models - Alphabetical
-    this.register(new DallE2Model());
-    this.register(new DallE3Model());
+    // OpenAI Models
     this.register(new GPTImage1Model());
   }
 
@@ -117,8 +111,6 @@ class ModelRegistry {
       'qwen_image',
       'seedream4',
       // OpenAI Models
-      'dall_e_2',
-      'dall_e_3',
       'gpt_image_1',
     ];
 
@@ -160,8 +152,6 @@ class ModelRegistry {
         this.getModel('seedream4')
       ],
       'OpenAI Models': [
-        this.getModel('dall_e_2'),
-        this.getModel('dall_e_3'),
         this.getModel('gpt_image_1'),
       ]
     };
