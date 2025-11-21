@@ -108,6 +108,7 @@ export default function ImagePreviewModal({
               height={1024}
               className="max-w-full max-h-[55vh] sm:max-h-[65vh] object-contain rounded-sm"
               priority
+              unoptimized
             />
           </div>
         </div>

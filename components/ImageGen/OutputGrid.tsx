@@ -55,6 +55,7 @@ export default function OutputGrid() {
                 alt="Generated image"
                 fill
                 className="object-cover"
+                unoptimized
               />
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
