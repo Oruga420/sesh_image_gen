@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       id: prediction.id,
       status: prediction.status,
-      streamUrl: prediction.streamUrl ?? null,
+      // Don't send streamUrl - it causes CORS issues when browser tries to connect directly
+      // We'll poll via our backend API instead
       webUrl: prediction.webUrl ?? null,
     });
   } catch (error) {

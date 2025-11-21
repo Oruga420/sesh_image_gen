@@ -1,20 +1,24 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, ModelKey } from "@/lib/models";
+import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
+import { extractImageUrlFromReplicateOutput } from "@/lib/utils/replicateOutput";
 import { Button } from "@/components/ui/button";
 import ModelSelect from "@/components/ImageGen/ModelSelect";
 import PromptBox from "@/components/ImageGen/PromptBox";
+import AspectRatioSelector from "@/components/ImageGen/AspectRatioSelector";
 import ImageRefUploader from "@/components/ImageGen/ImageRefUploader";
 import OutputGrid from "@/components/ImageGen/OutputGrid";
 import PromptRewritePopup from "@/components/PromptUpgrade/PromptRewritePopup";
 import Link from "next/link";
 
 export default function ImageGenPage() {
-  const { 
+  const {
     selectedModel,
-    currentPrompt, 
+    currentPrompt,
+    aspectRatio,
     referenceImages,
     isGenerating,
     setIsGenerating,
@@ -22,6 +26,13 @@ export default function ImageGenPage() {
   } = useSessionStore();
   
   const [error, setError] = useState<string>("");
+  const [nanoBananaResolution, setNanoBananaResolution] = useState<'1K' | '2K' | '4K'>('1K');
+
+  useEffect(() => {
+    if (selectedModel !== 'nano_banana_pro') {
+      setNanoBananaResolution('1K');
+    }
+  }, [selectedModel]);
 
   const handleGenerate = async () => {
     if (!currentPrompt.trim()) {
@@ -98,16 +109,50 @@ export default function ImageGenPage() {
   };
 
   const handleReplicateGenerate = async (model: typeof MODELS[ModelKey]) => {
+    console.log('🚀 Starting Replicate generation for model:', selectedModel);
     const input: Record<string, any> = {
       prompt: currentPrompt,
     };
 
-    // Add image references if supported
-    if (model.supportsImageRef && referenceImages.length > 0) {
-      if (selectedModel === 'nano_banana') {
-        input.image_input = referenceImages;
+    // Add aspect ratio support
+    const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
+    const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
+    console.log('📐 Aspect ratio:', aspectRatio, 'Value:', aspectRatioValue, 'Dimensions:', customDimensions);
+
+    // Add custom dimensions if the model supports it
+    if (customDimensions.width && customDimensions.height) {
+      input.width = customDimensions.width;
+      input.height = customDimensions.height;
+      if (selectedModel === 'flux_1_1_pro') {
+        input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
+      }
+    } else {
+      // For models that use aspect_ratio parameter (not width/height)
+      if (aspectRatioValue !== '1:1') { // Only add if not default square
+        input.aspect_ratio = aspectRatioValue;
       }
     }
+
+    if (selectedModel === 'nano_banana_pro') {
+      input.resolution = nanoBananaResolution;
+    }
+
+    // Add image references if supported
+    if (model.supportsImageRef && referenceImages.length > 0) {
+      if (
+        selectedModel === 'nano_banana' ||
+        selectedModel === 'nano_banana_pro' ||
+        selectedModel === 'seedream4'
+      ) {
+        input.image_input = referenceImages;
+      } else if (selectedModel === 'flux_1_1_pro' || selectedModel === 'flux_1_1_pro_ultra') {
+        input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
+      } else if (selectedModel === 'flux_kontext_max') {
+        input.image_prompt = referenceImages[0]; // FLUX Kontext Max uses image_prompt
+      }
+    }
+
+    console.log('📤 Sending request to /api/replicate/predict with input:', input);
 
     // Start prediction
     const response = await fetch('/api/replicate/predict', {
@@ -119,68 +164,111 @@ export default function ImageGenPage() {
       })
     });
 
+    console.log('📥 Prediction response status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Prediction request failed:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const prediction = await response.json();
+    console.log('✅ Prediction created:', prediction);
 
     if (prediction.error) {
       throw new Error(prediction.error);
     }
 
-    // Watch stream if available
-    if (prediction.streamUrl) {
-      watchReplicateStream(
-        prediction.streamUrl,
-        (data) => {
-          console.log('Stream data:', data);
-        },
-        () => {
-          // When completed, poll for final result
-          pollPrediction(prediction.id);
-        }
-      );
-    } else {
-      // Fallback to polling
-      pollPrediction(prediction.id);
-    }
+    // Always use polling (streamUrl causes CORS issues)
+    console.log('⏳ Starting polling for prediction ID:', prediction.id);
+    pollPrediction(prediction.id);
   };
   
   const pollPrediction = async (predictionId: string) => {
-    // Simple polling implementation
+    const startTime = Date.now();
+    const maxWaitTime = 10 * 60 * 1000; // 10 minutes max
+    let pollCount = 0;
+
+    // Poll our backend endpoint instead of Replicate directly
     const poll = async () => {
       try {
-        const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-          headers: {
-            'Authorization': `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`
+        pollCount++;
+        const elapsed = Date.now() - startTime;
+
+        // Check for timeout
+        if (elapsed > maxWaitTime) {
+          throw new Error('Generation timed out after 10 minutes. The model may be overloaded or the request may be too complex.');
+        }
+
+        const response = await fetch(`/api/replicate/status/${predictionId}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const prediction = await response.json();
+
+        // Debug logging
+        console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
+
+        if (prediction.error) {
+          throw new Error(prediction.error);
+        }
+
+        if (prediction.status === 'succeeded') {
+          // Handle successful completion
+          const imageUrl =
+            (typeof prediction.imageUrl === "string" &&
+              prediction.imageUrl.trim()) ||
+            (Array.isArray(prediction.imageUrls) &&
+              prediction.imageUrls.length > 0 &&
+              prediction.imageUrls[0]) ||
+            extractImageUrlFromReplicateOutput(prediction.output);
+
+          if (!imageUrl) {
+            console.warn(
+              "Replicate prediction completed without an identifiable image URL.",
+              prediction.output
+            );
+            throw new Error(
+              "Generation succeeded but did not return an image URL. Please try again."
+            );
           }
-        });
-        
-        // Note: This won't work in production due to CORS and exposed token
-        // In real implementation, create a server route for polling
-        console.log('Would poll prediction:', predictionId);
-        
-        // Mock completion for demo
-        setTimeout(() => {
-          addGeneratedImage({
+
+          console.log("Replicate generation succeeded. Image URL:", imageUrl);
+
+          const imageData = {
             id: Date.now().toString(),
-            url: 'https://via.placeholder.com/512x512?text=Generated+Image',
+            url: imageUrl,
             prompt: currentPrompt,
             modelKey: selectedModel,
             timestamp: Date.now(),
-            predictionId
-          });
+            predictionId,
+          };
+          console.log("Adding image to store:", imageData);
+          addGeneratedImage(imageData);
           setIsGenerating(false);
-        }, 3000);
-        
+          return;
+        } else if (prediction.status === 'failed') {
+          throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
+        } else if (prediction.status === 'canceled') {
+          throw new Error('Generation was canceled');
+        } else {
+          // Still in progress, poll again after delay
+          // Increase polling interval for long-running predictions
+          const delay = pollCount > 30 ? 5000 : 2000; // 5s after 1 minute, 2s before
+          setTimeout(() => poll(), delay);
+        }
+
       } catch (error) {
         console.error('Polling error:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
         setIsGenerating(false);
       }
     };
-    
-    poll();
+
+    // Start polling with initial delay
+    setTimeout(() => poll(), 1000);
   };
   
   const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
@@ -221,6 +309,29 @@ export default function ImageGenPage() {
             
             <ModelSelect />
             <PromptBox />
+            <AspectRatioSelector />
+            {selectedModel === 'nano_banana_pro' && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">
+                  Resolution
+                </label>
+                <div className="flex gap-2">
+                  {(['1K', '2K', '4K'] as const).map((resolution) => (
+                    <Button
+                      key={resolution}
+                      type="button"
+                      variant={nanoBananaResolution === resolution ? 'default' : 'outline'}
+                      onClick={() => setNanoBananaResolution(resolution)}
+                    >
+                      {resolution}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Higher resolutions increase cost and generation time.
+                </p>
+              </div>
+            )}
             <ImageRefUploader />
             
             {error && (

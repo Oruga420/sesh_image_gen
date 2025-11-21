@@ -17,6 +17,7 @@ import { IdeogramV3TurboModel } from './ideogram-v3-turbo';
 
 // Other Models (Alphabetical)
 import { NanoBananaModel } from './nano-banana';
+import { NanoBananaProModel } from './nano-banana-pro';
 import { ProteusV03Model } from './proteus-v0-3';
 import { QwenImageModel } from './qwen-image';
 import { SeeDream4Model } from './seedream4';
@@ -39,6 +40,7 @@ export type ModelKey =
   | 'ideogram_v3_turbo'
   // Other Models
   | 'nano_banana'
+  | 'nano_banana_pro'
   | 'proteus_v0_3'
   | 'qwen_image'
   | 'seedream4'
@@ -66,6 +68,7 @@ class ModelRegistry {
 
     // Other Models - Alphabetical
     this.register(new NanoBananaModel());
+    this.register(new NanoBananaProModel());
     this.register(new ProteusV03Model());
     this.register(new QwenImageModel());
     this.register(new SeeDream4Model());
@@ -107,6 +110,7 @@ class ModelRegistry {
       'ideogram_v3_turbo',
       // Other Models
       'nano_banana',
+      'nano_banana_pro',
       'proteus_v0_3',
       'qwen_image',
       'seedream4',
@@ -147,6 +151,7 @@ class ModelRegistry {
       ],
       'Other Models': [
         this.getModel('nano_banana'),
+        this.getModel('nano_banana_pro'),
         this.getModel('proteus_v0_3'),
         this.getModel('qwen_image'),
         this.getModel('seedream4')
