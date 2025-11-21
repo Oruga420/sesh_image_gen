@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { REPLICATE_API } from "@/lib/replicate";
 import {
   extractAllImageUrlsFromReplicateOutput,
   extractImageUrlFromReplicateOutput,
@@ -17,63 +18,55 @@ export async function GET(
 
   try {
     if (!predictionId) {
-      console.error("❌ Missing prediction ID in request");
+      console.error("?? Missing prediction ID in request");
       return NextResponse.json({ error: "Missing prediction ID" }, { status: 400 });
     }
 
     const apiToken = process.env.REPLICATE_API_TOKEN;
 
     if (!apiToken) {
-      console.error("❌ REPLICATE_API_TOKEN missing in status check!");
+      console.error("?? REPLICATE_API_TOKEN missing in status check!");
       return NextResponse.json({
         error: "REPLICATE_API_TOKEN environment variable is not set"
       }, { status: 500 });
     }
 
-    console.log("✅ API Token present for status check:", apiToken.substring(0, 10) + "...");
+    const searchParams = req.nextUrl.searchParams;
+    const waitParam = searchParams.get("wait");
+    const waitSecondsRaw = waitParam ? Number(waitParam) : undefined;
+    const waitSeconds = Number.isFinite(waitSecondsRaw) ? waitSecondsRaw! : 2;
+    const clampedWait = Math.max(1, Math.min(waitSeconds, 60));
 
-    // Use the official Replicate client to get prediction status
-    console.log("🔄 Initializing Replicate client for status check...");
-    const Replicate = (await import('replicate')).default;
-    const replicate = new Replicate({
-      auth: apiToken,
+    console.log(
+      "? API Token present for status check:",
+      apiToken.substring(0, 10) + "...",
+      "| wait=",
+      clampedWait
+    );
+
+    const response = await fetch(`${REPLICATE_API}/predictions/${predictionId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+        Prefer: `wait=${clampedWait}`,
+      },
+      cache: "no-store",
     });
 
-    console.log("📡 Calling replicate.predictions.get for:", predictionId);
-    const prediction = await replicate.predictions.get(predictionId);
-
-    console.log("\n📥 RAW REPLICATE STATUS RESPONSE:");
-    console.log("Full prediction object:", JSON.stringify(prediction, null, 2));
-
-    // Detailed status analysis
-    console.log("\n📊 STATUS ANALYSIS:");
-    console.log(`Status: ${prediction.status}`);
-    console.log(`Has output: ${prediction.output ? 'YES' : 'NO'}`);
-    console.log(`Has error: ${prediction.error ? 'YES' : 'NO'}`);
-    console.log(`Created at: ${prediction.created_at}`);
-    console.log(`Started at: ${prediction.started_at}`);
-    console.log(`Completed at: ${prediction.completed_at}`);
-
-    if (prediction.output) {
-      console.log("🖼️ OUTPUT DETAILS:");
-      console.log("Output type:", typeof prediction.output);
-      console.log("Is array:", Array.isArray(prediction.output));
-      console.log("Output content:", prediction.output);
-      if (Array.isArray(prediction.output)) {
-        console.log("Array length:", prediction.output.length);
-        prediction.output.forEach((item, idx) => {
-          console.log(`Item ${idx}:`, item);
-        });
-      }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("?? Replicate status fetch failed:", response.status, errorText);
+      return NextResponse.json(
+        { error: `Replicate status error ${response.status}` },
+        { status: response.status }
+      );
     }
 
-    if (prediction.error) {
-      console.error("❌ PREDICTION ERROR:", prediction.error);
-    }
+    const prediction = await response.json();
 
-    if (prediction.logs) {
-      console.log("📝 PREDICTION LOGS:", prediction.logs);
-    }
+    console.log("\n??? RAW REPLICATE STATUS RESPONSE:");
+    console.log(JSON.stringify(prediction, null, 2));
 
     const primaryImageUrl = extractImageUrlFromReplicateOutput(
       prediction.output
@@ -82,7 +75,7 @@ export async function GET(
       prediction.output
     );
 
-    const response = {
+    const responsePayload = {
       id: prediction.id,
       status: prediction.status,
       output: prediction.output,
@@ -92,13 +85,13 @@ export async function GET(
       logs: prediction.logs,
     };
 
-    console.log("\n📤 RETURNING TO CLIENT:");
-    console.log(JSON.stringify(response, null, 2));
+    console.log("\n?? RETURNING TO CLIENT:");
+    console.log(JSON.stringify(responsePayload, null, 2));
     console.log("=== END STATUS CHECK ===\n");
 
-    return NextResponse.json(response);
+    return NextResponse.json(responsePayload);
   } catch (error) {
-    console.error("\n❌ STATUS CHECK FAILED:");
+    console.error("\n?? STATUS CHECK FAILED:");
     console.error("Error type:", error?.constructor?.name);
     console.error("Error message:", error instanceof Error ? error.message : "Unknown error");
     console.error("Full error:", error);
