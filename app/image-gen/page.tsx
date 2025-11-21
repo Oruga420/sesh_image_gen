@@ -128,9 +128,8 @@ export default function ImageGenPage() {
       }
     } else {
       // For models that use aspect_ratio parameter (not width/height)
-      if (aspectRatioValue !== '1:1') { // Only add if not default square
-        input.aspect_ratio = aspectRatioValue;
-      }
+      // Always send a value so models don't default to match_input_image
+      input.aspect_ratio = aspectRatioValue;
     }
 
     if (selectedModel === 'nano_banana_pro') {
