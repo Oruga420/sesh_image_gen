@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  extractAllImageUrlsFromReplicateOutput,
+  extractImageUrlFromReplicateOutput,
+} from "@/lib/utils/replicateOutput";
 
 export const runtime = "nodejs";
 
@@ -71,10 +75,19 @@ export async function GET(
       console.log("📝 PREDICTION LOGS:", prediction.logs);
     }
 
+    const primaryImageUrl = extractImageUrlFromReplicateOutput(
+      prediction.output
+    );
+    const imageUrls = extractAllImageUrlsFromReplicateOutput(
+      prediction.output
+    );
+
     const response = {
       id: prediction.id,
       status: prediction.status,
       output: prediction.output,
+      imageUrl: primaryImageUrl,
+      imageUrls,
       error: prediction.error,
       logs: prediction.logs,
     };
