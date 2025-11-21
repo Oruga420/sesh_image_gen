@@ -123,9 +123,6 @@ export default function ImageGenPage() {
     if (customDimensions.width && customDimensions.height) {
       input.width = customDimensions.width;
       input.height = customDimensions.height;
-      if (selectedModel === 'flux_1_1_pro') {
-        input.aspect_ratio = 'custom'; // FLUX needs this for custom dimensions
-      }
     } else {
       // For models that use aspect_ratio parameter (not width/height)
       // Always send a value so models don't default to match_input_image
@@ -144,10 +141,8 @@ export default function ImageGenPage() {
         selectedModel === 'seedream4'
       ) {
         input.image_input = referenceImages;
-      } else if (selectedModel === 'flux_1_1_pro' || selectedModel === 'flux_1_1_pro_ultra') {
+      } else if (selectedModel === 'flux_1_1_pro_ultra') {
         input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
-      } else if (selectedModel === 'flux_kontext_max') {
-        input.image_prompt = referenceImages[0]; // FLUX Kontext Max uses image_prompt
       }
     }
 
