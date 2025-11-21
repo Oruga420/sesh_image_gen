@@ -47,7 +47,7 @@ export default function ChatPanel() {
 
       // Add reference images if supported
       if (model.supportsImageRef && editReferenceImages.length > 0) {
-        if (selectedModel === 'nano_banana') {
+        if (selectedModel === 'nano_banana' || selectedModel === 'nano_banana_pro') {
           input.image_input = editReferenceImages;
         }
       }

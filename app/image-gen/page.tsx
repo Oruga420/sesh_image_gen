@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, ModelKey } from "@/lib/models";
 import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
+import { extractImageUrlFromReplicateOutput } from "@/lib/utils/replicateOutput";
 import { Button } from "@/components/ui/button";
 import ModelSelect from "@/components/ImageGen/ModelSelect";
 import PromptBox from "@/components/ImageGen/PromptBox";
@@ -127,7 +128,11 @@ export default function ImageGenPage() {
 
     // Add image references if supported
     if (model.supportsImageRef && referenceImages.length > 0) {
-      if (selectedModel === 'nano_banana' || selectedModel === 'seedream4') {
+      if (
+        selectedModel === 'nano_banana' ||
+        selectedModel === 'nano_banana_pro' ||
+        selectedModel === 'seedream4'
+      ) {
         input.image_input = referenceImages;
       } else if (selectedModel === 'flux_1_1_pro' || selectedModel === 'flux_1_1_pro_ultra') {
         input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
@@ -199,10 +204,27 @@ export default function ImageGenPage() {
           throw new Error(prediction.error);
         }
 
-        if (prediction.status === 'succeeded' && prediction.output) {
+        if (prediction.status === 'succeeded') {
           // Handle successful completion
-          const imageUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
-          console.log('🎉 Generation succeeded! Image URL:', imageUrl);
+          const imageUrl =
+            (typeof prediction.imageUrl === "string" &&
+              prediction.imageUrl.trim()) ||
+            (Array.isArray(prediction.imageUrls) &&
+              prediction.imageUrls.length > 0 &&
+              prediction.imageUrls[0]) ||
+            extractImageUrlFromReplicateOutput(prediction.output);
+
+          if (!imageUrl) {
+            console.warn(
+              "Replicate prediction completed without an identifiable image URL.",
+              prediction.output
+            );
+            throw new Error(
+              "Generation succeeded but did not return an image URL. Please try again."
+            );
+          }
+
+          console.log("Replicate generation succeeded. Image URL:", imageUrl);
 
           const imageData = {
             id: Date.now().toString(),
@@ -210,11 +232,12 @@ export default function ImageGenPage() {
             prompt: currentPrompt,
             modelKey: selectedModel,
             timestamp: Date.now(),
-            predictionId
+            predictionId,
           };
-          console.log('💾 Adding image to store:', imageData);
+          console.log("Adding image to store:", imageData);
           addGeneratedImage(imageData);
           setIsGenerating(false);
+          return;
         } else if (prediction.status === 'failed') {
           throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
         } else if (prediction.status === 'canceled') {
