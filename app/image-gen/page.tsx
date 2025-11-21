@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSessionStore } from "@/store/useSessionStore";
 import { MODELS, ModelKey } from "@/lib/models";
 import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
@@ -26,6 +26,13 @@ export default function ImageGenPage() {
   } = useSessionStore();
   
   const [error, setError] = useState<string>("");
+  const [nanoBananaResolution, setNanoBananaResolution] = useState<'1K' | '2K' | '4K'>('1K');
+
+  useEffect(() => {
+    if (selectedModel !== 'nano_banana_pro') {
+      setNanoBananaResolution('1K');
+    }
+  }, [selectedModel]);
 
   const handleGenerate = async () => {
     if (!currentPrompt.trim()) {
@@ -124,6 +131,10 @@ export default function ImageGenPage() {
       if (aspectRatioValue !== '1:1') { // Only add if not default square
         input.aspect_ratio = aspectRatioValue;
       }
+    }
+
+    if (selectedModel === 'nano_banana_pro') {
+      input.resolution = nanoBananaResolution;
     }
 
     // Add image references if supported
@@ -299,6 +310,28 @@ export default function ImageGenPage() {
             <ModelSelect />
             <PromptBox />
             <AspectRatioSelector />
+            {selectedModel === 'nano_banana_pro' && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">
+                  Resolution
+                </label>
+                <div className="flex gap-2">
+                  {(['1K', '2K', '4K'] as const).map((resolution) => (
+                    <Button
+                      key={resolution}
+                      type="button"
+                      variant={nanoBananaResolution === resolution ? 'default' : 'outline'}
+                      onClick={() => setNanoBananaResolution(resolution)}
+                    >
+                      {resolution}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Higher resolutions increase cost and generation time.
+                </p>
+              </div>
+            )}
             <ImageRefUploader />
             
             {error && (

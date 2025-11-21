@@ -42,7 +42,7 @@ export class NanoBananaProModel extends BaseModel {
     description:
       "Google's Gemini 3 Pro-powered text-to-image and editing model with high fidelity text rendering",
     costPerImage: 14, // $0.14 for default 2K generations
-    defaultSize: '2K',
+    defaultSize: '1K',
   };
 
   validateInput(input: any): NanoBananaProInput {
@@ -64,7 +64,7 @@ export class NanoBananaProModel extends BaseModel {
 
     const validResolutions: ResolutionOption[] = ['1K', '2K', '4K'];
     const resolution: ResolutionOption =
-      validResolutions.includes(input.resolution) ? input.resolution : '2K';
+      validResolutions.includes(input.resolution) ? input.resolution : '1K';
 
     const validAspectRatios: AspectRatioOption[] = [
       'match_input_image',
@@ -124,7 +124,7 @@ export class NanoBananaProModel extends BaseModel {
   transformInput(input: NanoBananaProInput): Record<string, any> {
     const transformed: Record<string, any> = {
       prompt: input.prompt,
-      resolution: input.resolution ?? '2K',
+      resolution: input.resolution ?? '1K',
       output_format: input.output_format ?? 'jpg',
       safety_filter_level: input.safety_filter_level ?? 'block_only_high',
     };
