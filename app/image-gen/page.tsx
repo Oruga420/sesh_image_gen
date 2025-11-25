@@ -141,6 +141,8 @@ export default function ImageGenPage() {
         selectedModel === 'seedream4'
       ) {
         input.image_input = referenceImages;
+      } else if (selectedModel === 'flux_2_pro') {
+        input.input_images = referenceImages.slice(0, 8);
       } else if (selectedModel === 'flux_1_1_pro_ultra') {
         input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
       }

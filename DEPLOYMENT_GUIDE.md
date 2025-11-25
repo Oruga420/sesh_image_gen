@@ -63,17 +63,10 @@ Get model versions from:
 - Prompt input with character counter
 - Image reference uploader (enabled/disabled per model)
 - Generate button with loading states
-- Output grid with download and edit links
+- Output grid with quick download + preview
 - Prompt upgrade popup with streaming enhancement
 
-### 2. Edit Models Screen (`/edit`)
-- Chat interface for conversational editing
-- Reference image support
-- Generated image history (ephemeral)
-- Model filtering (only edit-capable models)
-- "Use as reference" functionality
-
-### 3. Technical Implementation
+### 2. Technical Implementation
 - **Next.js 14** App Router with TypeScript
 - **Zustand** for ephemeral state management
 - **Tailwind CSS** for styling
@@ -81,7 +74,7 @@ Get model versions from:
 - **Model Registry** with capability flags
 - **Streaming Support** for real-time updates
 
-### 4. API Integration
+### 3. API Integration
 - `/api/replicate/predict` - Image generation
 - `/api/groq/rewrite` - Prompt enhancement with SSE
 - `/api/groq/transcribe` - Speech-to-text (ready)
@@ -90,7 +83,6 @@ Get model versions from:
 ```
 app/
 ├── image-gen/page.tsx          # Main generation screen
-├── edit/page.tsx               # Conversational editing
 ├── api/
 │   ├── replicate/predict/      # Image generation endpoint
 │   └── groq/
@@ -98,7 +90,6 @@ app/
 │       └── transcribe/         # Speech-to-text
 components/
 ├── ImageGen/                   # Generation components
-├── Edit/                       # Chat interface
 ├── PromptUpgrade/              # Enhancement popup
 └── ui/                         # Base components
 lib/

@@ -1,6 +1,6 @@
 # Sesh Image Gen
 
-Advanced AI image generation platform with multiple models, editing capabilities, and intelligent prompt enhancement.
+Advanced AI image generation platform with multiple models, reference support, and intelligent prompt enhancement.
 
 ## Features
 
@@ -16,11 +16,10 @@ Advanced AI image generation platform with multiple models, editing capabilities
 - **Live Streaming**: Watch your prompt being enhanced in real-time
 - **Groq Integration**: Fast prompt rewriting using OpenAI-compatible API
 
-### 🔧 Conversational Editing  
-- **Chat Interface**: Natural conversation flow for image editing
-- **Edit History**: See all generations and edits in context (ephemeral)
-- **Reference Management**: Use previous generations as references for new edits
-- **Model Filtering**: Only edit-capable models available in edit mode
+### 🖼️ Reference-Friendly Workflow
+- **Bring Your Own Images**: Feed supporting visuals into models that accept references
+- **Reusable Outputs**: Quickly download and reuse any generation as a future reference
+- **One-Click Copy**: Grab shareable URLs directly from the preview modal
 
 ## Tech Stack
 
@@ -66,7 +65,6 @@ export const MODELS: Record<ModelKey, {
   replicateModelPath: string;   // Replicate model path
   versionEnv: string;           // Environment variable name
   supportsImageRef: boolean;    // Enable/disable uploader  
-  supportsEdit: boolean;        // Show in edit mode
   defaultSize: string;          // UI preset
   name: string;                 // Display name
   description: string;          // Description
@@ -136,7 +134,7 @@ Configure custom domain if needed in Vercel dashboard.
 1. Add model definition to `lib/models.ts`
 2. Add environment variable for version
 3. Update API routes if special input handling needed
-4. Test capabilities (image refs, editing)
+4. Test capabilities (image refs, prompt upgrade)
 
 ### Prompt Enhancement Modes
 - **enhance**: Improve clarity and detail

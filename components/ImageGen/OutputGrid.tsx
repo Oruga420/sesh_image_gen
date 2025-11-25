@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import ImagePreviewModal from "@/components/ui/image-preview-modal";
 import { MODELS } from "@/lib/models/registry";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function OutputGrid() {
   const { generatedImages } = useSessionStore();
@@ -77,19 +76,11 @@ export default function OutputGrid() {
                 </span>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
-                  <a href={image.url} download target="_blank">
-                    Download
-                  </a>
-                </Button>
-
-                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
-                  <Link href={`/edit?ref=${encodeURIComponent(image.url)}`}>
-                    Edit
-                  </Link>
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <a href={image.url} download target="_blank" rel="noopener noreferrer">
+                  Download
+                </a>
+              </Button>
             </div>
           </div>
         ))}

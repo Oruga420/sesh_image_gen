@@ -11,17 +11,6 @@ export interface GeneratedImage {
   revisedPrompt?: string;
 }
 
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  prompt: string;
-  images: GeneratedImage[];
-  referenceImages?: string[];
-  timestamp: number;
-  modelKey: ModelKey;
-  status: 'generating' | 'completed' | 'failed';
-}
-
 export type AspectRatio = 'square' | 'landscape' | 'portrait';
 
 export interface SessionStore {
@@ -32,13 +21,7 @@ export interface SessionStore {
   referenceImages: string[];
   isGenerating: boolean;
   generatedImages: GeneratedImage[];
-  
-  // Edit Screen State (ephemeral chat history)
-  editMessages: ChatMessage[];
-  editPrompt: string;
-  editReferenceImages: string[];
-  isEditGenerating: boolean;
-  
+
   // Prompt Upgrade State  
   isUpgradeOpen: boolean;
   upgradePrompt: string;
@@ -54,15 +37,7 @@ export interface SessionStore {
   removeReferenceImage: (index: number) => void;
   setIsGenerating: (generating: boolean) => void;
   addGeneratedImage: (image: GeneratedImage) => void;
-  
-  // Edit Actions
-  addEditMessage: (message: ChatMessage) => void;
-  setEditPrompt: (prompt: string) => void;
-  setEditReferenceImages: (images: string[]) => void;
-  addEditReferenceImage: (imageUrl: string) => void;
-  setIsEditGenerating: (generating: boolean) => void;
-  clearEditHistory: () => void;
-  
+
   // Prompt Upgrade Actions
   setIsUpgradeOpen: (open: boolean) => void;
   setUpgradePrompt: (prompt: string) => void;
@@ -80,11 +55,6 @@ const initialState = {
   referenceImages: [],
   isGenerating: false,
   generatedImages: [],
-  
-  editMessages: [],
-  editPrompt: '',
-  editReferenceImages: [],
-  isEditGenerating: false,
   
   isUpgradeOpen: false,
   upgradePrompt: '',
@@ -112,19 +82,6 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set((state) => ({ 
       generatedImages: [...state.generatedImages, image] 
     })),
-    
-  addEditMessage: (message) =>
-    set((state) => ({ 
-      editMessages: [...state.editMessages, message] 
-    })),
-  setEditPrompt: (prompt) => set({ editPrompt: prompt }),
-  setEditReferenceImages: (images) => set({ editReferenceImages: images }),
-  addEditReferenceImage: (imageUrl) =>
-    set((state) => ({ 
-      editReferenceImages: [...state.editReferenceImages, imageUrl] 
-    })),
-  setIsEditGenerating: (generating) => set({ isEditGenerating: generating }),
-  clearEditHistory: () => set({ editMessages: [] }),
   
   setIsUpgradeOpen: (open) => set({ isUpgradeOpen: open }),
   setUpgradePrompt: (prompt) => set({ upgradePrompt: prompt }),
