@@ -31,8 +31,7 @@ Our latest and most advanced model for image generation is gpt-image-1, a native
 We recommend this model for its high-quality image generation and ability to use world knowledge in image creation. However, you can also use specialized image generation models—DALL·E 2 and DALL·E 3—with the Image API.
 
 Model	Endpoints	Use case
-DALL·E 2	Image API: Generations, Edits, Variations	Lower cost, concurrent requests, inpainting (image editing with a mask)
-DALL·E 3	Image API: Generations only	Higher image quality than DALL·E 2, support for larger resolutions
+
 GPT Image	Image API: Generations, Edits – Responses API support coming soon	Superior instruction following, text rendering, detailed editing, real-world knowledge
 This guide focuses on GPT Image, but you can also switch to the docs for DALL·E 2 and DALL·E 3.
 

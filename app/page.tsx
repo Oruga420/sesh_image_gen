@@ -10,7 +10,7 @@ export default function HomePage() {
             Sesh Image Gen
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Advanced AI image generation platform with multiple models, editing capabilities, and intelligent prompt enhancement.
+            Advanced AI image generation platform with multiple models, reference support, and intelligent prompt enhancement.
           </p>
         </div>
         
@@ -18,12 +18,6 @@ export default function HomePage() {
           <Button asChild size="lg" className="text-lg px-8">
             <Link href="/image-gen">
               Start Creating
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" size="lg" className="text-lg px-8">
-            <Link href="/edit">
-              Edit Models
             </Link>
           </Button>
         </div>
@@ -44,9 +38,9 @@ export default function HomePage() {
           </div>
           
           <div className="bg-gray-800/50 backdrop-blur rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-3">Advanced Editing</h3>
+            <h3 className="text-xl font-semibold mb-3">Reference-Friendly</h3>
             <p className="text-gray-300">
-              Conversational image editing with reference support and iterative improvements.
+              Bring your own images for guidance and keep generations focused on your vision.
             </p>
           </div>
         </div>
