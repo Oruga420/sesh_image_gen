@@ -2,6 +2,7 @@ import { BaseModel } from './base';
 
 // FLUX Models (Black Forest Labs)
 import { Flux11ProUltraModel } from './flux-1-1-pro-ultra';
+import { Flux2ProModel } from './flux-2-pro';
 
 // Google Models (Imagen)
 import { Imagen4FastModel } from './imagen4-fast';
@@ -21,6 +22,7 @@ import { SeeDream4Model } from './seedream4';
 export type ModelKey =
   // FLUX Models
   | 'flux_1_1_pro_ultra'
+  | 'flux_2_pro'
   // Google Models
   | 'imagen4_fast'
   | 'imagen4'
@@ -40,6 +42,7 @@ class ModelRegistry {
   constructor() {
     // FLUX Models (Black Forest Labs) - Alphabetical
     this.register(new Flux11ProUltraModel());
+    this.register(new Flux2ProModel());
 
     // Google Models (Imagen) - Alphabetical
     this.register(new Imagen4FastModel());
@@ -78,6 +81,7 @@ class ModelRegistry {
     const orderedKeys: ModelKey[] = [
       // FLUX Models
       'flux_1_1_pro_ultra',
+      'flux_2_pro',
       // Google Models
       'imagen4_fast',
       'imagen4',
@@ -110,6 +114,7 @@ class ModelRegistry {
     return {
       'FLUX Models (Black Forest Labs)': [
         this.getModel('flux_1_1_pro_ultra'),
+        this.getModel('flux_2_pro'),
       ],
       'Google Models (Imagen)': [
         this.getModel('imagen4_fast'),
