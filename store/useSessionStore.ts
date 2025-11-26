@@ -22,7 +22,6 @@ export interface SessionStore {
   isGenerating: boolean;
   generatedImages: GeneratedImage[];
   imagesToGenerate: number;
-  activeGenerations: number;
 
   // Prompt Upgrade State  
   isUpgradeOpen: boolean;
@@ -37,10 +36,9 @@ export interface SessionStore {
   setReferenceImages: (images: string[]) => void;
   addReferenceImage: (imageUrl: string) => void;
   removeReferenceImage: (index: number) => void;
+  setIsGenerating: (generating: boolean) => void;
   addGeneratedImage: (image: GeneratedImage) => void;
   setImagesToGenerate: (count: number) => void;
-  startGeneration: () => void;
-  finishGeneration: () => void;
 
   // Prompt Upgrade Actions
   setIsUpgradeOpen: (open: boolean) => void;
@@ -60,7 +58,6 @@ const initialState = {
   isGenerating: false,
   generatedImages: [],
   imagesToGenerate: 1,
-  activeGenerations: 0,
   
   isUpgradeOpen: false,
   upgradePrompt: '',
@@ -83,6 +80,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set((state) => ({ 
       referenceImages: state.referenceImages.filter((_, i) => i !== index) 
     })),
+  setIsGenerating: (generating) => set({ isGenerating: generating }),
   addGeneratedImage: (image) =>
     set((state) => ({ 
       generatedImages: [...state.generatedImages, image] 
@@ -90,22 +88,6 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   setImagesToGenerate: (count) =>
     set({
       imagesToGenerate: Math.max(1, Math.min(5, Math.floor(count))),
-    }),
-  startGeneration: () =>
-    set((state) => {
-      const nextCount = state.activeGenerations + 1;
-      return {
-        activeGenerations: nextCount,
-        isGenerating: true,
-      };
-    }),
-  finishGeneration: () =>
-    set((state) => {
-      const nextCount = Math.max(0, state.activeGenerations - 1);
-      return {
-        activeGenerations: nextCount,
-        isGenerating: nextCount > 0,
-      };
     }),
   
   setIsUpgradeOpen: (open) => set({ isUpgradeOpen: open }),

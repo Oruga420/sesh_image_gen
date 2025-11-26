@@ -6,7 +6,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 const IMAGE_OPTIONS = [1, 2, 3, 4, 5];
 
 export default function ImageCountSelector() {
-  const { imagesToGenerate, setImagesToGenerate } = useSessionStore();
+  const { imagesToGenerate, setImagesToGenerate, isGenerating } = useSessionStore();
 
   return (
     <div className="mb-6">
@@ -20,6 +20,7 @@ export default function ImageCountSelector() {
             type="button"
             variant={imagesToGenerate === count ? 'default' : 'outline'}
             onClick={() => setImagesToGenerate(count)}
+            disabled={isGenerating}
           >
             {count}
           </Button>

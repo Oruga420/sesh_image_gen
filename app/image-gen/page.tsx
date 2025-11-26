@@ -21,11 +21,10 @@ export default function ImageGenPage() {
     currentPrompt,
     aspectRatio,
     referenceImages,
+    isGenerating,
+    setIsGenerating,
     addGeneratedImage,
     imagesToGenerate,
-    activeGenerations,
-    startGeneration,
-    finishGeneration,
   } = useSessionStore();
   
   const [error, setError] = useState<string>("");
@@ -39,7 +38,6 @@ export default function ImageGenPage() {
 
   const generationLabel = imagesToGenerate > 1 ? `${imagesToGenerate} Images` : "Image";
   const generationLabelLower = imagesToGenerate > 1 ? `${imagesToGenerate} images` : "image";
-  const hasActiveGenerations = activeGenerations > 0;
 
   const handleGenerate = async () => {
     const promptSnapshot = currentPrompt.trim();
@@ -56,7 +54,7 @@ export default function ImageGenPage() {
     const nanoBananaResolutionSnapshot = nanoBananaResolution;
 
     setError("");
-    startGeneration();
+    setIsGenerating(true);
 
     try {
       const model = MODELS[modelKeySnapshot];
@@ -84,7 +82,7 @@ export default function ImageGenPage() {
       console.error('Generation error:', error);
       setError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
-      finishGeneration();
+      setIsGenerating(false);
     }
   };
 
@@ -418,19 +416,14 @@ const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: 
             
             <Button 
               onClick={handleGenerate}
-              disabled={!currentPrompt.trim()}
+              disabled={isGenerating || !currentPrompt.trim()}
               className="w-full"
               size="lg"
             >
-              {hasActiveGenerations
-                ? `Queue ${generationLabelLower}`
+              {isGenerating
+                ? `Generating ${generationLabelLower}...`
                 : `Generate ${generationLabel}`}
             </Button>
-            {hasActiveGenerations && (
-              <p className="text-xs text-gray-500 text-center mt-2">
-                {activeGenerations} generation{activeGenerations === 1 ? '' : 's'} running. You can start another anytime.
-              </p>
-            )}
           </div>
           
           {/* Output Panel */}
