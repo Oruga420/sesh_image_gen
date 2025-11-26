@@ -21,6 +21,7 @@ export interface SessionStore {
   referenceImages: string[];
   isGenerating: boolean;
   generatedImages: GeneratedImage[];
+  imagesToGenerate: number;
 
   // Prompt Upgrade State  
   isUpgradeOpen: boolean;
@@ -37,6 +38,7 @@ export interface SessionStore {
   removeReferenceImage: (index: number) => void;
   setIsGenerating: (generating: boolean) => void;
   addGeneratedImage: (image: GeneratedImage) => void;
+  setImagesToGenerate: (count: number) => void;
 
   // Prompt Upgrade Actions
   setIsUpgradeOpen: (open: boolean) => void;
@@ -55,6 +57,7 @@ const initialState = {
   referenceImages: [],
   isGenerating: false,
   generatedImages: [],
+  imagesToGenerate: 1,
   
   isUpgradeOpen: false,
   upgradePrompt: '',
@@ -82,6 +85,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set((state) => ({ 
       generatedImages: [...state.generatedImages, image] 
     })),
+  setImagesToGenerate: (count) =>
+    set({
+      imagesToGenerate: Math.max(1, Math.min(5, Math.floor(count))),
+    }),
   
   setIsUpgradeOpen: (open) => set({ isUpgradeOpen: open }),
   setUpgradePrompt: (prompt) => set({ upgradePrompt: prompt }),

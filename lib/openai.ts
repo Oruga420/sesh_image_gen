@@ -22,6 +22,7 @@ export async function generateImage(
     output_format?: 'png' | 'jpeg' | 'webp';
     output_compression?: number; // 0-100
     background?: 'transparent' | 'opaque' | 'auto';
+    n?: number;
   }
 ) {
   const client = getOpenAIClient();
@@ -53,6 +54,10 @@ export async function generateImage(
   if (finalOptions.background && finalOptions.background !== 'auto') {
     requestBody.background = finalOptions.background;
   }
+  if (finalOptions.n) {
+    const count = Math.max(1, Math.min(5, Math.floor(finalOptions.n)));
+    requestBody.n = count;
+  }
 
   const response = await client.images.generate(requestBody);
 
@@ -71,6 +76,7 @@ export async function editImage(
     background?: 'transparent' | 'opaque' | 'auto';
     mask?: string; // base64 or URL
     input_fidelity?: 'low' | 'high';
+    n?: number;
   }
 ) {
   const client = getOpenAIClient();
@@ -106,6 +112,10 @@ export async function editImage(
   }
   if (finalOptions.mask) {
     requestBody.mask = finalOptions.mask;
+  }
+  if (finalOptions.n) {
+    const count = Math.max(1, Math.min(5, Math.floor(finalOptions.n)));
+    requestBody.n = count;
   }
 
   const response = await client.images.edit(requestBody);
