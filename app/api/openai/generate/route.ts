@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
       output_format,
       output_compression,
       background,
-      input_fidelity
+      input_fidelity,
+      imageCount,
+      n,
     } = input;
 
     // Validate prompt
@@ -42,6 +44,17 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const requestedCount =
+      typeof imageCount === "number"
+        ? imageCount
+        : typeof n === "number"
+        ? n
+        : 1;
+    const imagesToGenerate = Math.max(
+      1,
+      Math.min(5, Math.floor(requestedCount))
+    );
 
     let response;
 
@@ -59,6 +72,7 @@ export async function POST(req: NextRequest) {
           background: background || "auto",
           mask,
           input_fidelity: input_fidelity || "low",
+          n: imagesToGenerate,
         }
       );
     } else {
@@ -69,6 +83,7 @@ export async function POST(req: NextRequest) {
         output_format: output_format || "png",
         output_compression,
         background: background || "auto",
+        n: imagesToGenerate,
       });
     }
 

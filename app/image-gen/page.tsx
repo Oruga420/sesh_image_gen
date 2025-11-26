@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useSessionStore } from "@/store/useSessionStore";
+import { useSessionStore, type AspectRatio } from "@/store/useSessionStore";
 import { MODELS, ModelKey } from "@/lib/models";
 import { getAspectRatioForModel, getCustomDimensionsForModel } from "@/lib/utils/aspectRatio";
 import { extractImageUrlFromReplicateOutput } from "@/lib/utils/replicateOutput";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import ModelSelect from "@/components/ImageGen/ModelSelect";
 import PromptBox from "@/components/ImageGen/PromptBox";
 import AspectRatioSelector from "@/components/ImageGen/AspectRatioSelector";
+import ImageCountSelector from "@/components/ImageGen/ImageCountSelector";
 import ImageRefUploader from "@/components/ImageGen/ImageRefUploader";
 import OutputGrid from "@/components/ImageGen/OutputGrid";
 import PromptRewritePopup from "@/components/PromptUpgrade/PromptRewritePopup";
@@ -22,7 +23,8 @@ export default function ImageGenPage() {
     referenceImages,
     isGenerating,
     setIsGenerating,
-    addGeneratedImage
+    addGeneratedImage,
+    imagesToGenerate,
   } = useSessionStore();
   
   const [error, setError] = useState<string>("");
@@ -34,40 +36,75 @@ export default function ImageGenPage() {
     }
   }, [selectedModel]);
 
+  const generationLabel = imagesToGenerate > 1 ? `${imagesToGenerate} Images` : "Image";
+  const generationLabelLower = imagesToGenerate > 1 ? `${imagesToGenerate} images` : "image";
+
   const handleGenerate = async () => {
-    if (!currentPrompt.trim()) {
+    const promptSnapshot = currentPrompt.trim();
+
+    if (!promptSnapshot) {
       setError("Please enter a prompt");
       return;
     }
+
+    const modelKeySnapshot = selectedModel;
+    const imagesRequested = Math.max(1, Math.min(5, imagesToGenerate));
+    const referenceImagesSnapshot = [...referenceImages];
+    const aspectRatioSnapshot = aspectRatio;
+    const nanoBananaResolutionSnapshot = nanoBananaResolution;
 
     setError("");
     setIsGenerating(true);
 
     try {
-      const model = MODELS[selectedModel];
+      const model = MODELS[modelKeySnapshot];
 
-      // Route to different API based on provider
       if (model.provider === 'openai') {
-        await handleOpenAIGenerate(model);
+        await handleOpenAIGenerate(model, {
+          prompt: promptSnapshot,
+          modelKey: modelKeySnapshot,
+          imagesRequested,
+          referenceImages: referenceImagesSnapshot,
+        });
       } else if (model.provider === 'replicate') {
-        await handleReplicateGenerate(model);
+        await handleReplicateGenerate(model, {
+          prompt: promptSnapshot,
+          modelKey: modelKeySnapshot,
+          imagesRequested,
+          aspectRatio: aspectRatioSnapshot,
+          referenceImages: referenceImagesSnapshot,
+          nanoBananaResolution: nanoBananaResolutionSnapshot,
+        });
       } else {
         throw new Error('Unsupported model provider');
       }
-
     } catch (error) {
       console.error('Generation error:', error);
       setError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleOpenAIGenerate = async (model: typeof MODELS[ModelKey]) => {
+  const handleOpenAIGenerate = async (
+    model: typeof MODELS[ModelKey],
+    {
+      prompt,
+      modelKey,
+      imagesRequested,
+      referenceImages,
+    }: {
+      prompt: string;
+      modelKey: ModelKey;
+      imagesRequested: number;
+      referenceImages: string[];
+    }
+  ) => {
     const input: Record<string, any> = {
-      prompt: currentPrompt,
+      prompt,
+      imageCount: imagesRequested,
     };
 
-    // Add image references if supported (DALL-E 2 only)
     if (model.supportsImageRef && referenceImages.length > 0) {
       input.image_input = referenceImages;
     }
@@ -76,9 +113,9 @@ export default function ImageGenPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        modelKey: selectedModel,
-        input
-      })
+        modelKey,
+        input,
+      }),
     });
 
     if (!response.ok) {
@@ -92,182 +129,222 @@ export default function ImageGenPage() {
       throw new Error(result.error);
     }
 
-    // Add generated images to store
     const baseTimestamp = Date.now();
-    result.images.forEach((img: any, index: number) => {
+    (result.images || []).forEach((img: any, index: number) => {
+      if (!img?.b64_json) {
+        return;
+      }
+
       addGeneratedImage({
-        id: `${baseTimestamp}-${index}`,
+        id: `${baseTimestamp}-${modelKey}-${index}`,
         url: `data:image/png;base64,${img.b64_json}`,
-        prompt: currentPrompt,
-        modelKey: selectedModel,
-        timestamp: baseTimestamp + index, // Slightly different timestamps
+        prompt,
+        modelKey,
+        timestamp: baseTimestamp + index,
         revisedPrompt: img.revised_prompt,
       });
     });
-
-    setIsGenerating(false);
   };
 
-  const handleReplicateGenerate = async (model: typeof MODELS[ModelKey]) => {
-    console.log('🚀 Starting Replicate generation for model:', selectedModel);
-    const input: Record<string, any> = {
-      prompt: currentPrompt,
-    };
+    const handleReplicateGenerate = async (
+    model: typeof MODELS[ModelKey],
+    {
+      prompt,
+      modelKey,
+      imagesRequested,
+      aspectRatio,
+      referenceImages,
+      nanoBananaResolution,
+    }: {
+      prompt: string;
+      modelKey: ModelKey;
+      imagesRequested: number;
+      aspectRatio: AspectRatio;
+      referenceImages: string[];
+      nanoBananaResolution: '1K' | '2K' | '4K';
+    }
+  ) => {
+    console.log('dYs? Starting Replicate generation for model:', modelKey, 'count:', imagesRequested);
 
-    // Add aspect ratio support
-    const aspectRatioValue = getAspectRatioForModel(aspectRatio, selectedModel);
-    const customDimensions = getCustomDimensionsForModel(aspectRatio, selectedModel);
-    console.log('📐 Aspect ratio:', aspectRatio, 'Value:', aspectRatioValue, 'Dimensions:', customDimensions);
+    const input: Record<string, any> = { prompt };
 
-    // Add custom dimensions if the model supports it
+    const aspectRatioValue = getAspectRatioForModel(aspectRatio, modelKey);
+    const customDimensions = getCustomDimensionsForModel(aspectRatio, modelKey);
+    console.log('dY"? Aspect ratio:', aspectRatio, 'Value:', aspectRatioValue, 'Dimensions:', customDimensions);
+
     if (customDimensions.width && customDimensions.height) {
       input.width = customDimensions.width;
       input.height = customDimensions.height;
     } else {
-      // For models that use aspect_ratio parameter (not width/height)
-      // Always send a value so models don't default to match_input_image
       input.aspect_ratio = aspectRatioValue;
     }
 
-    if (selectedModel === 'nano_banana_pro') {
+    if (modelKey === 'nano_banana_pro') {
       input.resolution = nanoBananaResolution;
     }
 
-    // Add image references if supported
     if (model.supportsImageRef && referenceImages.length > 0) {
       if (
-        selectedModel === 'nano_banana' ||
-        selectedModel === 'nano_banana_pro' ||
-        selectedModel === 'seedream4'
+        modelKey === 'nano_banana' ||
+        modelKey === 'nano_banana_pro' ||
+        modelKey === 'seedream4'
       ) {
         input.image_input = referenceImages;
-      } else if (selectedModel === 'flux_2_pro') {
+      } else if (modelKey === 'flux_2_pro') {
         input.input_images = referenceImages.slice(0, 8);
-      } else if (selectedModel === 'flux_1_1_pro_ultra') {
-        input.image_prompt = referenceImages[0]; // FLUX uses single image_prompt
+      } else if (modelKey === 'flux_1_1_pro_ultra') {
+        input.image_prompt = referenceImages[0];
       }
     }
 
-    console.log('📤 Sending request to /api/replicate/predict with input:', input);
+    const launchPrediction = async (requestIndex: number) => {
+      console.log(`dY"? Creating prediction ${requestIndex + 1}/${imagesRequested} for`, modelKey);
+      const response = await fetch('/api/replicate/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelKey,
+          input: { ...input },
+        }),
+      });
 
-    // Start prediction
-    const response = await fetch('/api/replicate/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        modelKey: selectedModel,
-        input
-      })
-    });
+      console.log('dY"? Prediction response status:', response.status);
 
-    console.log('📥 Prediction response status:', response.status);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('??O Prediction request failed:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Prediction request failed:', errorText);
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      const prediction = await response.json();
+      console.log('?o. Prediction created:', prediction);
+
+      if (prediction.error) {
+        throw new Error(prediction.error);
+      }
+
+      await pollPrediction(prediction.id, { prompt, modelKey });
+    };
+
+    const predictionPromises = Array.from({ length: imagesRequested }, (_, index) =>
+      launchPrediction(index)
+    );
+
+    const results = await Promise.allSettled(predictionPromises);
+    const failures = results.filter(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    );
+
+    if (failures.length === predictionPromises.length) {
+      throw failures[0]?.reason || new Error('All Replicate generations failed.');
     }
 
-    const prediction = await response.json();
-    console.log('✅ Prediction created:', prediction);
-
-    if (prediction.error) {
-      throw new Error(prediction.error);
+    if (failures.length > 0) {
+      const failureMessage = `${failures.length} of ${imagesRequested} image${
+        imagesRequested === 1 ? '' : 's'
+      } failed. Please try again if you need more.`;
+      setError(failureMessage);
     }
-
-    // Always use polling (streamUrl causes CORS issues)
-    console.log('⏳ Starting polling for prediction ID:', prediction.id);
-    pollPrediction(prediction.id);
   };
   
-  const pollPrediction = async (predictionId: string) => {
+  const pollPrediction = (
+    predictionId: string,
+    {
+      prompt,
+      modelKey,
+    }: {
+      prompt: string;
+      modelKey: ModelKey;
+    }
+  ): Promise<void> => {
     const startTime = Date.now();
-    const maxWaitTime = 10 * 60 * 1000; // 10 minutes max
+    const maxWaitTime = 10 * 60 * 1000;
     let pollCount = 0;
 
-    // Poll our backend endpoint instead of Replicate directly
-    const poll = async () => {
-      try {
-        pollCount++;
-        const elapsed = Date.now() - startTime;
+    return new Promise((resolve, reject) => {
+      const poll = async () => {
+        try {
+          pollCount++;
+          const elapsed = Date.now() - startTime;
 
-        // Check for timeout
-        if (elapsed > maxWaitTime) {
-          throw new Error('Generation timed out after 10 minutes. The model may be overloaded or the request may be too complex.');
-        }
-
-        const response = await fetch(`/api/replicate/status/${predictionId}`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const prediction = await response.json();
-
-        // Debug logging
-        console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
-
-        if (prediction.error) {
-          throw new Error(prediction.error);
-        }
-
-        if (prediction.status === 'succeeded') {
-          // Handle successful completion
-          const imageUrl =
-            (typeof prediction.imageUrl === "string" &&
-              prediction.imageUrl.trim()) ||
-            (Array.isArray(prediction.imageUrls) &&
-              prediction.imageUrls.length > 0 &&
-              prediction.imageUrls[0]) ||
-            extractImageUrlFromReplicateOutput(prediction.output);
-
-          if (!imageUrl) {
-            console.warn(
-              "Replicate prediction completed without an identifiable image URL.",
-              prediction.output
-            );
+          if (elapsed > maxWaitTime) {
             throw new Error(
-              "Generation succeeded but did not return an image URL. Please try again."
+              'Generation timed out after 10 minutes. The model may be overloaded or the request may be too complex.'
             );
           }
 
-          console.log("Replicate generation succeeded. Image URL:", imageUrl);
+          const response = await fetch(`/api/replicate/status/${predictionId}`);
 
-          const imageData = {
-            id: Date.now().toString(),
-            url: imageUrl,
-            prompt: currentPrompt,
-            modelKey: selectedModel,
-            timestamp: Date.now(),
-            predictionId,
-          };
-          console.log("Adding image to store:", imageData);
-          addGeneratedImage(imageData);
-          setIsGenerating(false);
-          return;
-        } else if (prediction.status === 'failed') {
-          throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
-        } else if (prediction.status === 'canceled') {
-          throw new Error('Generation was canceled');
-        } else {
-          // Still in progress, poll again after delay
-          // Increase polling interval for long-running predictions
-          const delay = pollCount > 30 ? 5000 : 2000; // 5s after 1 minute, 2s before
-          setTimeout(() => poll(), delay);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const prediction = await response.json();
+          console.log(`Poll ${pollCount} for ${predictionId}: ${prediction.status}`, prediction);
+
+          if (prediction.error) {
+            throw new Error(prediction.error);
+          }
+
+          if (prediction.status === 'succeeded') {
+            const responseUrls: string[] = Array.isArray(prediction.imageUrls)
+              ? prediction.imageUrls.filter((url: unknown): url is string => typeof url === 'string')
+              : [];
+            const fallbackUrl =
+              (typeof prediction.imageUrl === 'string' && prediction.imageUrl.trim()) ||
+              extractImageUrlFromReplicateOutput(prediction.output);
+
+            if (fallbackUrl) {
+              responseUrls.unshift(fallbackUrl);
+            }
+
+            const uniqueUrls = Array.from(
+              new Set(
+                responseUrls
+                  .map((url) => url?.trim())
+                  .filter((url): url is string => Boolean(url && url.length))
+              )
+            );
+
+            if (uniqueUrls.length === 0) {
+              throw new Error(
+                'Generation succeeded but did not return an image URL. Please try again.'
+              );
+            }
+
+            console.log('Replicate generation succeeded. Image URLs:', uniqueUrls);
+
+            const timestampBase = Date.now();
+            uniqueUrls.forEach((url, index) => {
+              addGeneratedImage({
+                id: `${predictionId}-${timestampBase}-${index}`,
+                url,
+                prompt,
+                modelKey,
+                timestamp: timestampBase + index,
+                predictionId,
+              });
+            });
+
+            resolve();
+            return;
+          } else if (prediction.status === 'failed') {
+            throw new Error(`Generation failed: ${prediction.error || 'Unknown error'}`);
+          } else if (prediction.status === 'canceled') {
+            throw new Error('Generation was canceled');
+          } else {
+            const delay = pollCount > 30 ? 5000 : 2000;
+            setTimeout(poll, delay);
+          }
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error('Unknown error occurred'));
         }
+      };
 
-      } catch (error) {
-        console.error('Polling error:', error);
-        setError(error instanceof Error ? error.message : 'Unknown error occurred');
-        setIsGenerating(false);
-      }
-    };
-
-    // Start polling with initial delay
-    setTimeout(() => poll(), 1000);
+      setTimeout(poll, 1000);
+    });
   };
-  
-  const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
+const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
     const es = new EventSource(url);
     es.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
@@ -306,6 +383,7 @@ export default function ImageGenPage() {
             <ModelSelect />
             <PromptBox />
             <AspectRatioSelector />
+            <ImageCountSelector />
             {selectedModel === 'nano_banana_pro' && (
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">
@@ -342,7 +420,9 @@ export default function ImageGenPage() {
               className="w-full"
               size="lg"
             >
-              {isGenerating ? "Generating..." : "Generate Image"}
+              {isGenerating
+                ? `Generating ${generationLabelLower}...`
+                : `Generate ${generationLabel}`}
             </Button>
           </div>
           
