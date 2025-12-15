@@ -18,6 +18,7 @@ import { NanoBananaModel } from './nano-banana';
 import { NanoBananaProModel } from './nano-banana-pro';
 import { QwenImageModel } from './qwen-image';
 import { SeeDream4Model } from './seedream4';
+import { ZImageTurboModel } from './z-image-turbo';
 
 export type ModelKey =
   // FLUX Models
@@ -34,7 +35,8 @@ export type ModelKey =
   | 'nano_banana'
   | 'nano_banana_pro'
   | 'qwen_image'
-  | 'seedream4';
+  | 'seedream4'
+  | 'z_image_turbo';
 
 class ModelRegistry {
   private models: Map<ModelKey, BaseModel> = new Map();
@@ -58,6 +60,7 @@ class ModelRegistry {
     this.register(new NanoBananaProModel());
     this.register(new QwenImageModel());
     this.register(new SeeDream4Model());
+    this.register(new ZImageTurboModel());
   }
 
   private register(model: BaseModel) {
@@ -94,6 +97,7 @@ class ModelRegistry {
       'nano_banana_pro',
       'qwen_image',
       'seedream4',
+      'z_image_turbo',
     ];
 
     return orderedKeys.map(key => this.getModel(key));
@@ -129,7 +133,8 @@ class ModelRegistry {
         this.getModel('nano_banana'),
         this.getModel('nano_banana_pro'),
         this.getModel('qwen_image'),
-        this.getModel('seedream4')
+        this.getModel('seedream4'),
+        this.getModel('z_image_turbo'),
       ]
     };
   }

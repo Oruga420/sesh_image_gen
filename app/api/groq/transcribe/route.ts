@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { groq } from "@/lib/groq";
+import { getGroqClient } from "@/lib/groq";
 
 export const runtime = "nodejs";
 
@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       return new Response("No file provided", { status: 400 });
     }
 
+    const groq = getGroqClient();
     const transcription = await groq.audio.transcriptions.create({
       file,
       model: "whisper-large-v3-turbo",
