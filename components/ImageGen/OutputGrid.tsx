@@ -9,24 +9,27 @@ import Image from "next/image";
 
 export default function OutputGrid() {
   const { generatedImages } = useSessionStore();
-  const [previewImage, setPreviewImage] = useState<{
-    url: string;
-    prompt: string;
-    modelKey: string;
-    timestamp: number;
-  } | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
-  const handleImageClick = (image: typeof generatedImages[0]) => {
-    setPreviewImage({
-      url: image.url,
-      prompt: image.prompt,
-      modelKey: image.modelKey,
-      timestamp: image.timestamp,
-    });
+  // Newest first — same order as rendered
+  const sortedImages = [...generatedImages].reverse();
+
+  // Build a model name lookup map
+  const modelNames: Record<string, string | undefined> = {};
+  for (const key in MODELS) {
+    modelNames[key] = MODELS[key]?.name;
+  }
+
+  const handleImageClick = (displayIndex: number) => {
+    setPreviewIndex(displayIndex);
   };
 
   const closePreview = () => {
-    setPreviewImage(null);
+    setPreviewIndex(null);
+  };
+
+  const handleNavigate = (newIndex: number) => {
+    setPreviewIndex(newIndex);
   };
 
   if (generatedImages.length === 0) {
@@ -43,11 +46,11 @@ export default function OutputGrid() {
       <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Generated Images</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {[...generatedImages].reverse().map((image) => (
+        {sortedImages.map((image, displayIndex) => (
           <div key={image.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
             <div
               className="aspect-square relative cursor-pointer hover:opacity-90 transition-opacity group"
-              onClick={() => handleImageClick(image)}
+              onClick={() => handleImageClick(displayIndex)}
             >
               <Image
                 src={image.url}
@@ -88,12 +91,17 @@ export default function OutputGrid() {
 
       {/* Image Preview Modal */}
       <ImagePreviewModal
-        isOpen={!!previewImage}
+        isOpen={previewIndex !== null}
         onClose={closePreview}
-        imageUrl={previewImage?.url || ''}
-        prompt={previewImage?.prompt}
-        modelName={previewImage ? MODELS[previewImage.modelKey]?.name : undefined}
-        timestamp={previewImage?.timestamp}
+        images={sortedImages.map(img => ({
+          url: img.url,
+          prompt: img.prompt,
+          modelKey: img.modelKey,
+          timestamp: img.timestamp,
+        }))}
+        currentIndex={previewIndex ?? 0}
+        onNavigate={handleNavigate}
+        modelNames={modelNames}
       />
     </div>
   );
