@@ -41,15 +41,15 @@ export default function OutputGrid() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Generated Images</h3>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {generatedImages.map((image) => (
+        {[...generatedImages].reverse().map((image) => (
           <div key={image.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div 
+            <div
               className="aspect-square relative cursor-pointer hover:opacity-90 transition-opacity group"
               onClick={() => handleImageClick(image)}
             >
-              <Image 
+              <Image
                 src={image.url}
                 alt="Generated image"
                 fill
@@ -63,19 +63,19 @@ export default function OutputGrid() {
                 </div>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4">
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-3 line-clamp-2">
                 {image.prompt}
               </p>
-              
+
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs text-gray-500 dark:text-gray-400 mb-3 gap-1 sm:gap-0">
                 <span className="truncate">{MODELS[image.modelKey]?.name || image.modelKey}</span>
                 <span className="text-xs">
                   {new Date(image.timestamp).toLocaleDateString()}
                 </span>
               </div>
-              
+
               <Button variant="outline" size="sm" asChild className="w-full">
                 <a href={image.url} download target="_blank" rel="noopener noreferrer">
                   Download
@@ -85,7 +85,7 @@ export default function OutputGrid() {
           </div>
         ))}
       </div>
-      
+
       {/* Image Preview Modal */}
       <ImagePreviewModal
         isOpen={!!previewImage}
