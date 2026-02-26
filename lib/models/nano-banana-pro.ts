@@ -81,14 +81,14 @@ export class NanoBananaProModel extends BaseModel {
     ];
     const aspectRatio: AspectRatioOption | undefined =
       typeof input.aspect_ratio === 'string' &&
-      validAspectRatios.includes(input.aspect_ratio)
+        validAspectRatios.includes(input.aspect_ratio)
         ? input.aspect_ratio
         : undefined;
 
     const validFormats: OutputFormatOption[] = ['jpg', 'png'];
     const outputFormat: OutputFormatOption =
       typeof input.output_format === 'string' &&
-      validFormats.includes(input.output_format)
+        validFormats.includes(input.output_format)
         ? input.output_format
         : 'jpg';
 
@@ -97,18 +97,21 @@ export class NanoBananaProModel extends BaseModel {
       'block_medium_and_above',
       'block_only_high',
     ];
-    const safetyFilter: SafetyFilterOption =
+    const safetyFilter: SafetyFilterOption | undefined =
       typeof input.safety_filter_level === 'string' &&
-      validSafetyFilters.includes(input.safety_filter_level)
+        validSafetyFilters.includes(input.safety_filter_level)
         ? input.safety_filter_level
-        : 'block_only_high';
+        : undefined;
 
     const validated: NanoBananaProInput = {
       prompt: input.prompt,
       resolution,
       output_format: outputFormat,
-      safety_filter_level: safetyFilter,
     };
+
+    if (safetyFilter) {
+      validated.safety_filter_level = safetyFilter;
+    }
 
     if (imageInput.length > 0) {
       validated.image_input = imageInput;
@@ -126,8 +129,11 @@ export class NanoBananaProModel extends BaseModel {
       prompt: input.prompt,
       resolution: input.resolution ?? '1K',
       output_format: input.output_format ?? 'jpg',
-      safety_filter_level: input.safety_filter_level ?? 'block_only_high',
     };
+
+    if (input.safety_filter_level) {
+      transformed.safety_filter_level = input.safety_filter_level;
+    }
 
     if (input.image_input && input.image_input.length > 0) {
       transformed.image_input = input.image_input;
