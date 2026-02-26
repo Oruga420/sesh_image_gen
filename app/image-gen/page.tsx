@@ -27,7 +27,7 @@ export default function ImageGenPage() {
     startGeneration,
     finishGeneration,
   } = useSessionStore();
-  
+
   const [error, setError] = useState<string>("");
   const [nanoBananaResolution, setNanoBananaResolution] = useState<'1K' | '2K' | '4K'>('1K');
 
@@ -148,7 +148,7 @@ export default function ImageGenPage() {
     });
   };
 
-    const handleReplicateGenerate = async (
+  const handleReplicateGenerate = async (
     model: typeof MODELS[ModelKey],
     {
       prompt,
@@ -188,8 +188,10 @@ export default function ImageGenPage() {
     if (model.supportsImageRef && referenceImages.length > 0) {
       if (
         modelKey === 'nano_banana' ||
+        modelKey === 'nano_banana_2' ||
         modelKey === 'nano_banana_pro' ||
-        modelKey === 'seedream4'
+        modelKey === 'seedream4' ||
+        modelKey === 'seedream5_lite'
       ) {
         input.image_input = referenceImages;
       } else if (modelKey === 'flux_2_pro') {
@@ -242,13 +244,12 @@ export default function ImageGenPage() {
     }
 
     if (failures.length > 0) {
-      const failureMessage = `${failures.length} of ${imagesRequested} image${
-        imagesRequested === 1 ? '' : 's'
-      } failed. Please try again if you need more.`;
+      const failureMessage = `${failures.length} of ${imagesRequested} image${imagesRequested === 1 ? '' : 's'
+        } failed. Please try again if you need more.`;
       setError(failureMessage);
     }
   };
-  
+
   const pollPrediction = (
     predictionId: string,
     {
@@ -346,7 +347,7 @@ export default function ImageGenPage() {
       setTimeout(poll, 1000);
     });
   };
-const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
+  const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: () => void) => {
     const es = new EventSource(url);
     es.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
@@ -376,12 +377,12 @@ const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: 
             <Link href="/">← Home</Link>
           </Button>
         </div>
-        
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Controls Panel */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-6">Generation Settings</h2>
-            
+
             <ModelSelect />
             <PromptBox />
             <AspectRatioSelector />
@@ -409,14 +410,14 @@ const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: 
               </div>
             )}
             <ImageRefUploader />
-            
+
             {error && (
               <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
                 {error}
               </div>
             )}
-            
-            <Button 
+
+            <Button
               onClick={handleGenerate}
               disabled={!currentPrompt.trim()}
               className="w-full"
@@ -432,14 +433,14 @@ const watchReplicateStream = (url: string, onData: (data: any) => void, onDone: 
               </p>
             )}
           </div>
-          
+
           {/* Output Panel */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <OutputGrid />
           </div>
         </div>
       </div>
-      
+
       <PromptRewritePopup />
     </div>
   );
